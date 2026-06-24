@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBB Admin — Spotlight Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #1F3A33; font-family: 'Inter', sans-serif; color: #26211A; min-height: 100vh; }
+
+.page { max-width: 720px; margin: 0 auto; padding: 40px 20px 60px; }
+
+.admin-header { text-align: center; margin-bottom: 32px; }
+.admin-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #B8C9C2; margin: 0 0 8px; }
+.admin-header h1 { font-family: 'Caveat', cursive; font-size: 40px; font-weight: 700; color: #FBF6EC; margin: 0 0 6px; }
+.admin-sub { font-size: 13px; color: #8FA59C; margin: 0; }
+
+.card {
+  background: #FBF6EC; border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  padding: 28px 24px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.12em; color: #9C9382;
+  margin: 0 0 18px;
+}
+
+.field { margin-bottom: 16px; }
+.label { display: block; font-size: 12px; font-weight: 600; color: #5B5142; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+.label span { font-weight: 400; text-transform: none; color: #9C9382; }
+
+input[type=text], input[type=password], input[type=url], input[type=email], textarea, select {
+  width: 100%; font-family: 'Inter', sans-serif; font-size: 14px;
+  padding: 10px 12px; border: 1.5px solid #D8CDB4; border-radius: 5px;
+  background: #fff; color: #26211A; outline: none;
+  transition: border-color 0.15s;
+}
+input:focus, textarea:focus, select:focus { border-color: #1F6F5C; }
+textarea { resize: vertical; min-height: 80px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 540px) { .grid2 { grid-template-columns: 1fr; } }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: 6px; padding: 12px 22px;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+}
+.btn:hover { opacity: 0.88; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-primary { background: #1F6F5C; color: #FBF6EC; width: 100%; margin-top: 8px; }
+.btn-gold { background: #D4AF6A; color: #26211A; }
+.btn-danger { background: #C2452E; color: #FBF6EC; }
+.btn-outline { background: transparent; border: 1.5px solid #D8CDB4; color: #5B5142; }
+
+.msg { display: none; padding: 10px 14px; border-radius: 5px; font-size: 13px; margin-top: 12px; }
+.msg.visible { display: block; }
+.msg-success { background: #D4EDDA; color: #1A5C2A; }
+.msg-error { background: #F8D7DA; color: #721C24; }
+
+/* Login screen */
+#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+#login-screen .card { max-width: 360px; width: 100%; }
+#login-screen .card-title { text-align: center; }
+.lock-icon { text-align: center; font-size: 40px; margin-bottom: 16px; }
+
+/* Admin screen */
+#admin-screen { display: none; }
+
+/* Flyer preview */
+#flyer-preview-wrap { margin-top: 16px; display: none; }
+#admin-canvas { width: 100%; height: auto; border-radius: 4px; display: block; margin-bottom: 12px; }
+.flyer-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Current spotlight badge */
+.current-spotlight-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(31,111,92,0.12); border: 1px solid rgba(31,111,92,0.3);
+  color: #1F6F5C; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.nav-link { display: inline-flex; align-items: center; gap: 6px; color: #B8C9C2; font-size: 12px; font-family: 'IBM Plex Mono', monospace; text-decoration: none; margin-bottom: 16px; }
+.nav-link:hover { color: #FBF6EC; }
+
+.section-divider { border: none; border-top: 1px solid #E4D9C3; margin: 22px 0; }
+
+.hint { font-size: 11.5px; color: #9C9382; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div style="text-align:center;margin-bottom:24px;">
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#B8C9C2;margin:0 0 8px;">Kingdom Business Builders</p>
+    <h1 style="font-family:'Caveat',cursive;font-size:40px;font-weight:700;color:#FBF6EC;margin:0;">Admin Panel</h1>
+  </div>
+  <div class="card">
+    <div class="lock-icon">🔐</div>
+    <p class="card-title" style="text-align:center;">Enter Admin Password</p>
+    <div class="field">
+      <input type="password" id="password-input" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="login()" id="login-btn">Unlock →</button>
+    <div class="msg msg-error" id="login-error">Incorrect password. Try again.</div>
+  </div>
+  <p style="margin-top:16px;font-size:12px;color:#8FA59C;text-align:center;">Default password: <code style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:3px;color:#C9D6D0;">KBBAdmin2024</code></p>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div id="admin-screen">
+  <div class="page">
+    <a href="../" class="nav-link">← Back to site</a>
+
+    <div class="admin-header">
+      <p class="admin-eyebrow">Kingdom Business Builders</p>
+      <h1>Spotlight Manager</h1>
+      <p class="admin-sub">Set this week's featured business and generate a shareable flyer.</p>
+    </div>
+
+    <!-- Current spotlight status -->
+    <div id="current-status" style="display:none;" class="card">
+      <p class="card-title">Currently Active Spotlight</p>
+      <div id="current-status-inner"></div>
+      <hr class="section-divider">
+      <button class="btn btn-danger" onclick="clearSpotlight()" style="max-width:200px;">✕ Clear Spotlight</button>
+    </div>
+
+    <!-- Spotlight form -->
+    <div class="card">
+      <p class="card-title">Set New Spotlight Business</p>
+      <p style="font-size:13px;color:#6B6354;margin:0 0 18px;">Fill in the business details below. All info will appear on the homepage and the generated flyer.</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label class="label">Business Name *</label>
+          <input type="text" id="s-name" placeholder="e.g. Grace Hair Studio">
+        </div>
+        <div class="field">
+          <label class="label">Owner Name</label>
+          <input type="text" id="s-owner" placeholder="e.g. Grace Okonkwo">
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label class="label">Category</label>
+          <select id="s-category">
+            <option value="">Select…</option>
+            <option>Food</option>
+            <option>Beauty</option>
+            <option>Real Estate</option>
+            <option>Retail</option>
+            <option>Health & Wellness</option>
+            <option>Consulting</option>
+            <option>Tech</option>
+            <option>Ministry</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Location</label>
+          <input type="text" id="s-location" placeholder="e.g. Owings Mills, MD">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Short Description</label>
+        <textarea id="s-desc" placeholder="What makes this business special? (1–2 sentences)"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label">Logo URL <span>(optional — paste a direct image link)</span></label>
+        <input type="url" id="s-logo" placeholder="https://...">
+        <p class="hint">Tip: Upload to Google Drive, make public, copy direct link. Or use Imgur.</p>
+      </div>
+
+      <hr class="section-divider">
+      <p class="card-title">Contact & Links</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label class="label">Phone</label>
+          <input type="text" id="s-phone" placeholder="240-555-0100">
+        </div>
+        <div class="field">
+          <label class="label">Email</label>
+          <input type="email" id="s-email" placeholder="hello@example.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Website</label>
+        <input type="url" id="s-website" placeholder="https://example.com">
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label class="label">Instagram <span>(handle only)</span></label>
+          <input type="text" id="s-instagram" placeholder="gracehairstudio">
+        </div>
+        <div class="field">
+          <label class="label">Facebook <span>(handle or URL)</span></label>
+          <input type="text" id="s-facebook" placeholder="gracehairstudio">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">WhatsApp <span>(number with country code)</span></label>
+        <input type="text" id="s-whatsapp" placeholder="+12405550100">
+      </div>
+
+      <div class="msg msg-error" id="save-error"></div>
+      <div class="msg msg-success" id="save-success">✓ Spotlight saved! The homepage will now show this business.</div>
+
+      <button class="btn btn-primary" onclick="saveSpotlight()" id="save-btn">✦ Set as This Week's Spotlight</button>
+    </div>
+
+    <!-- Flyer generator -->
+    <div class="card" id="flyer-card" style="display:none;">
+      <p class="card-title">Generate Flyer</p>
+      <p style="font-size:13px;color:#6B6354;margin:0 0 16px;">Your spotlight is live! Generate a shareable flyer to post on social media.</p>
+      <button class="btn btn-gold" onclick="showFlyerPreview()" style="margin-bottom:16px;">🖼 Generate Flyer Preview</button>
+      <div id="flyer-preview-wrap">
+        <canvas id="admin-canvas" width="1080" height="1080"></canvas>
+        <div class="flyer-actions">
+          <button class="btn btn-gold" onclick="downloadAdminFlyer()">⬇ Download PNG</button>
+          <button class="btn btn-outline" onclick="copyShareMessage()">📋 Copy Share Message</button>
+        </div>
+        <p class="hint" style="margin-top:10px;" id="share-msg-hint"></p>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn btn-outline" onclick="logout()" style="font-size:12px;padding:8px 16px;">Lock Admin Panel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ydwbyeilhdecrgezogqh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2J5ZWlsaGRlY3JnZXpvZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTg5NjAsImV4cCI6MjA5NzgzNDk2MH0.V3zGn_eiEA8-rC-FhwBrDHFlbAignjg3bWrvPLtxAN0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CORRECT_HASH = '87c8c5f73cb31904d01391b4f832072cf1eb97a43afa2ec124039d94d5fdc870';
+
+let activeSpotlight = null;
+
+// Allow Enter key on password
+document.getElementById('password-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') login();
+});
+
+async function hashPassword(password) {
+  const msgBuffer = new TextEncoder().encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function login() {
+  const pw = document.getElementById('password-input').value;
+  if (!pw) return;
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  const hash = await hashPassword(pw);
+  if (hash === CORRECT_HASH) {
+    sessionStorage.setItem('kbb_admin', '1');
+    showAdmin();
+  } else {
+    document.getElementById('login-error').classList.add('visible');
+    btn.disabled = false;
+    btn.textContent = 'Unlock →';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('kbb_admin');
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+async function showAdmin() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  await loadCurrentSpotlight();
+}
+
+async function loadCurrentSpotlight() {
+  const { data } = await sb.from('spotlight').select('*').eq('active', true).order('created_at', { ascending: false }).limit(1);
+  if (data && data.length > 0) {
+    activeSpotlight = data[0];
+    const el = document.getElementById('current-status');
+    const inner = document.getElementById('current-status-inner');
+    el.style.display = 'block';
+    inner.innerHTML =
+      '<div class="current-spotlight-badge">✦ Currently featured: <strong>' + escHtml(data[0].business_name) + '</strong></div>' +
+      '<p style="font-size:13px;color:#6B6354;margin:4px 0 0;">' +
+        (data[0].owner_name ? 'Owner: ' + escHtml(data[0].owner_name) + ' · ' : '') +
+        (data[0].category ? escHtml(data[0].category) + ' · ' : '') +
+        (data[0].location ? escHtml(data[0].location) : '') +
+      '</p>';
+    // Prefill form
+    document.getElementById('s-name').value = data[0].business_name || '';
+    document.getElementById('s-owner').value = data[0].owner_name || '';
+    document.getElementById('s-category').value = data[0].category || '';
+    document.getElementById('s-location').value = data[0].location || '';
+    document.getElementById('s-desc').value = data[0].description || '';
+    document.getElementById('s-logo').value = data[0].logo_url || '';
+    document.getElementById('s-phone').value = data[0].phone || '';
+    document.getElementById('s-email').value = data[0].email || '';
+    document.getElementById('s-website').value = data[0].website || '';
+    document.getElementById('s-instagram').value = data[0].instagram || '';
+    document.getElementById('s-facebook').value = data[0].facebook || '';
+    document.getElementById('s-whatsapp').value = data[0].whatsapp || '';
+    document.getElementById('flyer-card').style.display = 'block';
+  }
+}
+
+async function saveSpotlight() {
+  const name = document.getElementById('s-name').value.trim();
+  if (!name) {
+    showMsg('save-error', 'Business name is required.'); return;
+  }
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  hideMsg('save-error'); hideMsg('save-success');
+
+  const payload = {
+    business_name: name,
+    owner_name: document.getElementById('s-owner').value.trim(),
+    category: document.getElementById('s-category').value,
+    location: document.getElementById('s-location').value.trim(),
+    description: document.getElementById('s-desc').value.trim(),
+    logo_url: document.getElementById('s-logo').value.trim(),
+    phone: document.getElementById('s-phone').value.trim(),
+    email: document.getElementById('s-email').value.trim(),
+    website: document.getElementById('s-website').value.trim(),
+    instagram: document.getElementById('s-instagram').value.trim().replace(/^@/, ''),
+    facebook: document.getElementById('s-facebook').value.trim(),
+    whatsapp: document.getElementById('s-whatsapp').value.trim(),
+    week_start: new Date().toISOString().split('T')[0],
+    active: true,
+  };
+
+  try {
+    // Deactivate all existing spotlights
+    await sb.from('spotlight').update({ active: false }).eq('active', true);
+    // Insert new spotlight
+    const { data, error } = await sb.from('spotlight').insert([payload]).select();
+    if (error) throw error;
+    activeSpotlight = data[0];
+    showMsg('save-success', '');
+    document.getElementById('flyer-card').style.display = 'block';
+    await loadCurrentSpotlight();
+  } catch (e) {
+    showMsg('save-error', 'Error saving: ' + (e.message || 'Unknown error'));
+  }
+
+  btn.disabled = false; btn.textContent = '✦ Set as This Week\'s Spotlight';
+}
+
+async function clearSpotlight() {
+  if (!confirm('Clear the current spotlight? The section will hide on the homepage.')) return;
+  await sb.from('spotlight').update({ active: false }).eq('active', true);
+  document.getElementById('current-status').style.display = 'none';
+  document.getElementById('flyer-card').style.display = 'none';
+  activeSpotlight = null;
+}
+
+function showFlyerPreview() {
+  if (!activeSpotlight) return;
+  document.getElementById('flyer-preview-wrap').style.display = 'block';
+  setTimeout(function() { drawAdminFlyer(activeSpotlight); }, 50);
+}
+
+/* ============================================================
+   FLYER DRAW (same logic as main page)
+   ============================================================ */
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '', lineY = y;
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && i > 0) {
+      ctx.fillText(line.trim(), x, lineY); line = words[i] + ' '; lineY += lineHeight;
+    } else { line = testLine; }
+  }
+  ctx.fillText(line.trim(), x, lineY);
+  return lineY;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawAdminFlyer(s) {
+  const canvas = document.getElementById('admin-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 1080, H = 1080;
+
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0, '#1A3028'); bgGrad.addColorStop(1, '#0F2019');
+  ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+  ctx.strokeStyle = '#D4AF6A'; ctx.lineWidth = 6;
+  ctx.strokeRect(28, 28, W - 56, H - 56);
+  ctx.strokeStyle = 'rgba(212,175,106,0.3)'; ctx.lineWidth = 1;
+  ctx.strokeRect(38, 38, W - 76, H - 76);
+
+  ctx.fillStyle = '#D4AF6A'; ctx.font = '28px serif'; ctx.textAlign = 'center';
+  ctx.fillText('✦', 55, 68); ctx.fillText('✦', W - 55, 68);
+  ctx.fillText('✦', 55, H - 42); ctx.fillText('✦', W - 55, H - 42);
+
+  ctx.fillStyle = '#D4AF6A'; ctx.font = 'bold 18px "IBM Plex Mono", monospace';
+  ctx.fillText('KINGDOM BUSINESS BUILDERS', W / 2, 90);
+
+  ctx.strokeStyle = '#D4AF6A'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(80, 105); ctx.lineTo(W - 80, 105); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(212,175,106,0.75)'; ctx.font = '13px "IBM Plex Mono", monospace';
+  ctx.fillText('✦  BUSINESS SPOTLIGHT OF THE WEEK  ✦', W / 2, 128);
+
+  const logoY = 185, logoR = 90;
+  ctx.save(); ctx.beginPath(); ctx.arc(W / 2, logoY, logoR, 0, Math.PI * 2);
+  ctx.fillStyle = '#243D35'; ctx.fill();
+  ctx.strokeStyle = '#D4AF6A'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+
+  function continueDrawing() {
+    ctx.fillStyle = '#FBF6EC'; ctx.font = 'bold 58px "Caveat", cursive'; ctx.textAlign = 'center';
+    ctx.fillText(s.business_name || '', W / 2, 330);
+
+    if (s.owner_name) {
+      ctx.fillStyle = '#B8C9C2'; ctx.font = '24px "Inter", sans-serif';
+      ctx.fillText('by ' + s.owner_name, W / 2, 368);
+    }
+
+    let badgeY = 410;
+    const badges = [];
+    if (s.category) badges.push(s.category);
+    if (s.location) badges.push('📍 ' + s.location);
+    if (badges.length > 0) {
+      ctx.font = 'bold 18px "Inter", sans-serif';
+      let totalW = 0;
+      const pads = badges.map(function(b) { return ctx.measureText(b).width + 40; });
+      pads.forEach(function(w) { totalW += w + 12; });
+      let bx = W / 2 - totalW / 2;
+      badges.forEach(function(b, i) {
+        const bw = pads[i];
+        ctx.fillStyle = 'rgba(212,175,106,0.18)'; roundRect(ctx, bx, badgeY - 22, bw, 34, 17); ctx.fill();
+        ctx.strokeStyle = 'rgba(212,175,106,0.5)'; ctx.lineWidth = 1; roundRect(ctx, bx, badgeY - 22, bw, 34, 17); ctx.stroke();
+        ctx.fillStyle = '#D4AF6A'; ctx.textAlign = 'left';
+        ctx.fillText(b, bx + 20, badgeY + 2); bx += bw + 12;
+      });
+      ctx.textAlign = 'center';
+    }
+
+    ctx.strokeStyle = 'rgba(212,175,106,0.3)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(100, 460); ctx.lineTo(W - 100, 460); ctx.stroke();
+
+    if (s.description) {
+      ctx.fillStyle = '#C9D6D0'; ctx.font = '22px "Inter", sans-serif'; ctx.textAlign = 'center';
+      wrapText(ctx, s.description, W / 2, 500, 800, 34);
+    }
+
+    let contactY = 620;
+    ctx.fillStyle = '#A0B8B0'; ctx.font = '20px "IBM Plex Mono", monospace'; ctx.textAlign = 'center';
+    if (s.phone) { ctx.fillText('📞 ' + s.phone, W / 2, contactY); contactY += 36; }
+    if (s.email) { ctx.fillText('✉ ' + s.email, W / 2, contactY); contactY += 36; }
+    if (s.website) { ctx.fillText('🌐 ' + s.website.replace(/^https?:\/\//, '').split('/')[0], W / 2, contactY); contactY += 36; }
+    if (s.instagram) { ctx.fillText('📸 @' + s.instagram.replace(/^@/, ''), W / 2, contactY); contactY += 36; }
+
+    ctx.strokeStyle = '#D4AF6A'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(80, H - 110); ctx.lineTo(W - 80, H - 110); ctx.stroke();
+
+    ctx.fillStyle = '#D4AF6A'; ctx.font = 'bold 20px "IBM Plex Mono", monospace'; ctx.textAlign = 'center';
+    ctx.fillText('KINGDOM BUSINESS BUILDERS', W / 2, H - 82);
+    ctx.fillStyle = 'rgba(212,175,106,0.6)'; ctx.font = '16px "Inter", sans-serif';
+    ctx.fillText('Pray. Plan. Prosper. | Daily 7 AM Prayer Community', W / 2, H - 54);
+    ctx.fillStyle = 'rgba(212,175,106,0.4)'; ctx.font = '13px "IBM Plex Mono", monospace';
+    const now = new Date();
+    ctx.fillText('Week of ' + now.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'}), W / 2, H - 30);
+
+    // Update share message
+    const msg = '✦ Kingdom Business Builders Spotlight ✦\n\nThis week we\'re spotlighting: ' + s.business_name + (s.owner_name ? ' by ' + s.owner_name : '') + '!\n\n' + (s.description || '') + '\n\n' + (s.phone ? '📞 ' + s.phone + '\n' : '') + (s.website ? '🌐 ' + s.website + '\n' : '') + '\nSupport faith-driven entrepreneurs! Visit: https://opeoluwaifagbemi-jpg.github.io/kingdom-business-builders/\n\n#KingdomBusinessBuilders #FaithAndBusiness #ChristianEntrepreneur';
+    document.getElementById('share-msg-hint').textContent = msg;
+  }
+
+  if (s.logo_url) {
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      ctx.save(); ctx.beginPath(); ctx.arc(W / 2, logoY, logoR - 4, 0, Math.PI * 2); ctx.clip();
+      ctx.drawImage(img, W / 2 - (logoR - 4), logoY - (logoR - 4), (logoR - 4) * 2, (logoR - 4) * 2);
+      ctx.restore(); continueDrawing();
+    };
+    img.onerror = function() {
+      drawInitials(ctx, s, W, logoY);  continueDrawing();
+    };
+    img.src = s.logo_url;
+  } else {
+    drawInitials(ctx, s, W, logoY); continueDrawing();
+  }
+}
+
+function drawInitials(ctx, s, W, logoY) {
+  const initials = (s.business_name || 'KBB').split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+  ctx.fillStyle = '#D4AF6A'; ctx.font = 'bold 60px "Caveat", cursive'; ctx.textAlign = 'center';
+  ctx.fillText(initials, W / 2, logoY + 22);
+}
+
+function downloadAdminFlyer() {
+  const canvas = document.getElementById('admin-canvas');
+  const name = activeSpotlight ? activeSpotlight.business_name.replace(/\s+/g, '_') : 'KBB_Flyer';
+  const link = document.createElement('a');
+  link.download = 'KBB_Spotlight_' + name + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function copyShareMessage() {
+  const msg = document.getElementById('share-msg-hint').textContent;
+  navigator.clipboard.writeText(msg).then(function() {
+    alert('Share message copied to clipboard! Paste it in WhatsApp, Instagram, or Facebook.');
+  });
+}
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+function escHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function(c) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function showMsg(id, text) {
+  const el = document.getElementById(id);
+  if (text) el.textContent = text;
+  el.classList.add('visible');
+}
+function hideMsg(id) { document.getElementById(id).classList.remove('visible'); }
+
+/* ============================================================
+   Init
+   ============================================================ */
+if (sessionStorage.getItem('kbb_admin') === '1') {
+  showAdmin();
+}
+</script>
+</body>
+</html>
