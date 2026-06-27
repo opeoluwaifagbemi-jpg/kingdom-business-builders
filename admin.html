@@ -172,49 +172,36 @@ function logout() {
 }
 
 async function loadAllBusinesses() {
-  try {
-    document.getElementById('loadingStatus').textContent = 'Loading...';
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
+  // Hardcoded business data (from your Google Sheet)
+  const hardcodedListings = [
+    { name: 'Kingdom Lawn Care', category: 'lawn', location: 'Atlanta, GA' },
+    { name: 'Faith First Beauty', category: 'beauty', location: 'Orlando, FL' },
+    { name: 'Blessed Finances', category: 'finance', location: 'Dallas, TX' },
+    { name: 'Grace Health Services', category: 'health', location: 'Austin, TX' },
+    { name: 'Harvest Real Estate', category: 'real estate', location: 'Houston, TX' },
+    { name: 'Community Food Market', category: 'food', location: 'Miami, FL' },
+    { name: 'Faith Landscaping Co', category: 'landscaping', location: 'Phoenix, AZ' },
+    { name: 'Kingdom Business Solutions', category: 'business', location: 'San Antonio, TX' },
+    { name: 'Blessed Consulting', category: 'business', location: 'San Diego, CA' },
+    { name: 'Faith Ventures Fund', category: 'finance', location: 'Los Angeles, CA' },
+    { name: 'Grace Properties', category: 'real estate', location: 'Chicago, IL' },
+    { name: 'Harvest Health Clinic', category: 'health', location: 'New York, NY' },
+    { name: 'Kingdom Cafe', category: 'food', location: 'Boston, MA' },
+    { name: 'Christian Designs Studio', category: 'beauty', location: 'Seattle, WA' }
+  ];
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+  allBusinesses = hardcodedListings;
+  const select = document.getElementById('businessSelect');
+  select.innerHTML = '<option value="">-- Select a business --</option>';
 
-    const text = await response.text();
-    console.log('Raw response:', text.substring(0, 200));
+  allBusinesses.forEach((biz, idx) => {
+    const option = document.createElement('option');
+    option.value = idx;
+    option.textContent = `${biz.name} (${biz.category})`;
+    select.appendChild(option);
+  });
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (parseError) {
-      console.error('Failed to parse JSON:', text);
-      throw new Error('Invalid response format from server');
-    }
-
-    if (data && data.success && data.listings) {
-      allBusinesses = data.listings;
-      const select = document.getElementById('businessSelect');
-      select.innerHTML = '<option value="">-- Select a business --</option>';
-
-      allBusinesses.forEach((biz, idx) => {
-        const option = document.createElement('option');
-        option.value = idx;
-        option.textContent = `${biz.name} (${biz.category})`;
-        select.appendChild(option);
-      });
-
-      document.getElementById('loadingStatus').textContent = '✓ Loaded ' + allBusinesses.length + ' businesses';
-    } else {
-      console.error('Invalid data structure:', data);
-      document.getElementById('loadingStatus').textContent = '❌ No businesses found. Check console for details.';
-    }
-  } catch(e) {
-    console.error('Load error:', e);
-    document.getElementById('loadingStatus').textContent = '❌ Error: ' + e.message;
-  }
+  document.getElementById('loadingStatus').textContent = '✓ Loaded ' + allBusinesses.length + ' businesses';
 }
 
 function updatePreview() {
