@@ -58,58 +58,201 @@ body { margin: 0; }
 .setup-banner { background: rgba(94,160,201,0.18); border: 1px solid rgba(94,160,201,0.4); color: #CFE6F2; }
 .hidden { display: none !important; }
 
-/* SPOTLIGHT & ADMIN STYLES */
-.spotlight-section { max-width: 1080px; margin: 0 auto 20px; }
-.spotlight-card { background: #fdfaf4; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; }
-.spotlight-top { display: grid; grid-template-columns: auto 1.2fr 0.8fr; gap: 0; }
-.spotlight-left { background: linear-gradient(135deg, #fdfaf4 0%, #f5f0e8 100%); min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 12px; }
-.spotlight-image-container { background: #f0f0f0; min-height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.spotlight-image-container img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
-.botw-badge { width: 120px; padding: 12px 10px 18px; background: linear-gradient(175deg, #f0c840 0%, #e8b820 30%, #c89010 100%); border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-.badge-crown { font-size: 20px; margin-bottom: 4px; }
-.badge-biz { font-size: 12px; font-weight: 900; color: #2e1a00; }
-.badge-week { font-size: 11px; font-weight: 900; color: #2e1a00; margin-top: 2px; }
-.badge-stars { font-size: 10px; color: #5a3800; margin-top: 4px; }
-.spotlight-right { padding: 16px 18px; display: flex; flex-direction: column; justify-content: center; }
-.featured-label { font-size: 9px; font-weight: 700; color: #c4900a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
-.business-name { font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: #111; line-height: 1.2; margin-bottom: 6px; }
-.biz-location { display: flex; align-items: center; gap: 4px; color: #444; font-size: 11px; margin-bottom: 4px; }
-.category-pill { display: inline-flex; background: #f2efe8; border: 1px solid #dbd5c5; border-radius: 12px; padding: 3px 10px; font-size: 10px; color: #3a3a3a; margin-bottom: 10px; }
-.heart-divider { text-align: center; color: #c4900a; font-size: 14px; margin: 8px 0; }
-.action-btns { display: flex; gap: 10px; margin-bottom: 12px; }
-.btn-act { flex: 1; background: #fff; border: 1.5px solid #e4dfd4; border-radius: 10px; padding: 12px 10px; cursor: pointer; text-align: center; transition: all 0.18s; }
-.btn-act:hover { transform: translateY(-2px); box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
-.btn-act .b-icon { font-size: 18px; display: block; margin-bottom: 4px; }
-.btn-act .b-lbl { font-size: 9px; font-weight: 800; color: #333; letter-spacing: 1px; text-transform: uppercase; }
+/* ===================== SPOTLIGHT CARD ===================== */
+.spotlight-section { max-width: 1080px; margin: 0 auto 40px; position: relative; z-index: 1; }
+.spotlight-card {
+  background: #fdfaf4;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 16px 56px rgba(0,0,0,0.13);
+  width: 100%;
+  overflow: hidden;
+}
+.spotlight-top { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.spotlight-left {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(240,200,64,0.08) 100px, rgba(240,200,64,0.08) 200px),
+    linear-gradient(135deg, #fdfaf4 0%, #f5f0e8 100%);
+  position: relative;
+  min-height: 370px;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow: hidden;
+}
+.spotlight-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(-45deg, transparent 0, transparent 60px, rgba(232,184,32,0.04) 60px, rgba(232,184,32,0.04) 120px);
+  pointer-events: none;
+}
+.botw-badge {
+  position: relative;
+  z-index: 10;
+  width: 280px;
+  padding: 30px 20px 50px;
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+  background: linear-gradient(175deg, #f0c840 0%, #e8b820 30%, #c89010 100%);
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.badge-crown { font-size: 48px; margin-bottom: 8px; }
+.badge-biz { font-size: 28px; font-weight: 900; color: #2e1a00; letter-spacing: 0.6px; line-height: 1.1; }
+.badge-of { font-size: 12px; color: #5a3800; letter-spacing: 3px; margin: 6px 0; text-transform: uppercase; }
+.badge-week { font-size: 28px; font-weight: 900; color: #2e1a00; letter-spacing: 0.6px; }
+.badge-stars { font-size: 16px; color: #5a3800; letter-spacing: 6px; margin-top: 10px; }
+.spotlight-right {
+  padding: 36px 40px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.featured-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #c4900a;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.business-name {
+  font-family: Georgia, serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+.biz-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #444;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.category-pill-spotlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f2efe8;
+  border: 1px solid #dbd5c5;
+  border-radius: 22px;
+  padding: 6px 16px;
+  font-size: 13px;
+  color: #3a3a3a;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.heart-divider { text-align: center; color: #c4900a; font-size: 24px; margin-bottom: 18px; }
+.action-btns {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.btn-act {
+  flex: 1;
+  background: #fff;
+  border: 1.5px solid #e4dfd4;
+  border-radius: 14px;
+  padding: 18px 12px 15px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.btn-act:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(0,0,0,0.1);
+}
+.btn-act .b-icon { font-size: 32px; display: block; margin-bottom: 6px; }
+.btn-act .b-lbl { font-size: 11px; font-weight: 800; color: #333; letter-spacing: 1.8px; text-transform: uppercase; }
 .btn-act.is-prayed { background: #eef7ee; border-color: #b8d8b8; }
 .btn-act.is-prayed .b-lbl { color: #286028; }
-.prayer-bar { background: #1e3d1e; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; color: #fff; }
-.pb-num { font-size: 20px; font-weight: 900; line-height: 1; }
-.pb-label { font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.88; }
-.spotlight-footer { border-top: 1px solid #e4dfd4; display: grid; grid-template-columns: 1fr 1fr 1fr; background: #fdfaf4; }
-.footer-col { display: flex; align-items: flex-start; gap: 8px; padding: 12px 12px; border-right: 1px solid #e4dfd4; }
+.prayer-bar {
+  background: #1e3d1e;
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+}
+.pb-icon { font-size: 24px; }
+.pb-num { font-size: 40px; font-weight: 900; line-height: 1; }
+.pb-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.88; }
+.spotlight-footer {
+  border-top: 1px solid #e4dfd4;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: #fdfaf4;
+}
+.footer-col {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  border-right: 1px solid #e4dfd4;
+}
 .footer-col:last-child { border-right: none; }
-.footer-icon { font-size: 14px; flex-shrink: 0; }
-.verse-ref { font-size: 8px; font-weight: 700; color: #666; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
-.verse-text, .prayer-text { font-size: 10px; color: #333; font-style: italic; line-height: 1.3; }
-.admin-login { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #FBF6EC; border-radius: 12px; padding: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 2000; max-width: 400px; width: 90%; }
-.admin-login.show { display: block; }
-.admin-login h2 { margin: 0 0 16px; font-size: 24px; color: #1F3A33; }
-.admin-login input { width: 100%; padding: 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
-.admin-login button { width: 100%; padding: 12px; background: #4FA992; color: #FBF6EC; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-.admin-login button:hover { background: #3F8A78; }
-.admin-btn { position: fixed; bottom: 20px; right: 20px; background: #FBF6EC; color: #1F3A33; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; z-index: 999; }
-.admin-btn:hover { background: #F0E7D8; }
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: #333; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; transition: transform 0.3s; z-index: 3000; }
-.toast.show { transform: translateX(-50%) translateY(0); }
+.footer-icon { font-size: 26px; flex-shrink: 0; }
+.footer-text { line-height: 1.4; }
+.verse-ref { font-size: 10px; font-weight: 700; color: #666; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.verse-text, .prayer-text { font-size: 13px; color: #333; font-style: italic; line-height: 1.5; }
+.tagline-main { font-size: 12px; font-weight: 700; color: #333; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.tagline-sub { font-size: 11px; color: #666; font-style: italic; }
 
 @media (max-width: 768px) {
   .spotlight-top { grid-template-columns: 1fr; }
-  .business-name { font-size: 28px; }
+  .business-name { font-size: 32px; }
+  .spotlight-right { padding: 24px 20px; }
   .spotlight-footer { grid-template-columns: 1fr; }
   .footer-col { border-right: none; border-bottom: 1px solid #e4dfd4; }
   .footer-col:last-child { border-bottom: none; }
 }
+
+/* SHARE MODAL & TOAST */
+.shareModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.shareModal.open { display: flex; }
+.share-content {
+  background: #fdfaf4;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+}
+.share-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #333; }
+#img-preview { width: 100%; text-align: center; }
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: #333;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  pointer-events: none;
+  transition: transform 0.3s;
+  z-index: 3000;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
 
 .tabs { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 22px; }
 
@@ -306,7 +449,7 @@ body { margin: 0; }
 <div class="board-root">
   <div class="board-bg" aria-hidden="true"></div>
 
-  <!-- SPOTLIGHT SECTION -->
+  <!-- SPOTLIGHT CARD (TOP) -->
   <div class="spotlight-section">
     <div class="spotlight-card">
       <div class="spotlight-top">
@@ -314,31 +457,31 @@ body { margin: 0; }
           <div class="botw-badge">
             <div class="badge-crown">👑</div>
             <div class="badge-biz">BUSINESS</div>
-            <div style="font-size: 11px; color: #5a3800; margin: 4px 0; letter-spacing: 2px;">OF THE WEEK</div>
-            <div class="badge-week">★ ★ ★</div>
+            <div class="badge-of">OF THE</div>
+            <div class="badge-week">WEEK</div>
+            <div class="badge-stars">★ ★ ★</div>
           </div>
         </div>
-        <div class="spotlight-image-container" id="spotlightImageContainer"></div>
         <div class="spotlight-right">
           <div class="featured-label">⭐ FEATURED THIS WEEK</div>
-          <h2 class="business-name" id="bizName">Select a Business</h2>
-          <div class="biz-location">📍 <span id="bizLocation">-</span></div>
-          <div class="category-pill" id="bizCategory">-</div>
+          <h2 class="business-name" id="biz-name">Kingdom Lawn Care</h2>
+          <div class="biz-location">📍 <span id="biz-location">Baltimore County</span></div>
+          <div class="category-pill-spotlight" id="biz-category">Lawn Care & Landscaping</div>
           <div class="heart-divider">💛</div>
           <div class="action-btns">
-            <button class="btn-act" id="prayedBtn" onclick="handlePrayed()">
+            <button class="btn-act" id="prayed-btn" onclick="handlePrayed()">
               <span class="b-icon">🙏</span>
-              <span class="b-lbl" id="prayedLbl">I Prayed</span>
+              <span class="b-lbl" id="prayed-lbl">I PRAYED</span>
             </button>
-            <button class="btn-act" onclick="shareSpotlight()">
+            <button class="btn-act" onclick="openShareModal()">
               <span class="b-icon">📱</span>
-              <span class="b-lbl">Share</span>
+              <span class="b-lbl">SHARE</span>
             </button>
           </div>
           <div class="prayer-bar">
-            <div style="font-size: 22px;">❤️</div>
+            <span class="pb-icon">❤️</span>
             <div>
-              <div class="pb-num" id="prayerCount">0</div>
+              <div class="pb-num" id="prayer-count">127</div>
               <div class="pb-label">PEOPLE PRAYED THIS WEEK</div>
             </div>
           </div>
@@ -347,21 +490,21 @@ body { margin: 0; }
       <div class="spotlight-footer">
         <div class="footer-col">
           <div class="footer-icon">📖</div>
-          <div>
-            <div class="verse-ref" id="verseRef">-</div>
-            <div class="verse-text" id="verseText">-</div>
+          <div class="footer-text">
+            <div class="verse-ref" id="verse-ref">PROVERBS 24:3-4</div>
+            <div class="verse-text" id="verse-text">"By wisdom a house is built..."</div>
           </div>
         </div>
         <div class="footer-col" style="border-left: 1px solid #e4dfd4; border-right: 1px solid #e4dfd4;">
           <div style="text-align: center; width: 100%;">
-            <div style="font-size: 11px; font-weight: 700; color: #333; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px;">SUPPORT. PRAY. SHARE.</div>
-            <div style="font-size: 10px; color: #666; font-style: italic;">Build His Kingdom Together.</div>
+            <div class="tagline-main">SUPPORT. PRAY. SHARE.</div>
+            <div class="tagline-sub">Build His Kingdom Together.</div>
           </div>
         </div>
         <div class="footer-col" style="border-left: none;">
           <div class="footer-icon">🙏</div>
-          <div>
-            <div class="prayer-text" id="prayerText" style="font-size: 11px;">-</div>
+          <div class="footer-text">
+            <div class="prayer-text" id="prayer-text">Lord, bless this business...</div>
           </div>
         </div>
       </div>
@@ -402,6 +545,17 @@ body { margin: 0; }
   </div>
 
   <p class="visibility-note"></p>
+
+  <!-- SHARE MODAL -->
+  <div class="shareModal" id="shareModal">
+    <div class="share-content">
+      <div class="share-header">📥 Share this Business</div>
+      <div id="img-preview"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
 </div>
 
 <script>
@@ -1064,9 +1218,12 @@ updateSetupBanner();
 updateOfflineBanner();
 switchView('board');
 
-/* ===================== SPOTLIGHT (PUBLIC) ===================== */
+/* ============================================================
+   SPOTLIGHT FUNCTIONS
+   ============================================================ */
 const SUPABASE_URL = 'https://ydwbyeilhdecrgezogqh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2J5ZWlsaGRlY3JnZXpvZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTg5NjAsImV4cCI6MjA5NzgzNDk2MH0.V3zGn_eiEA8-rC-FhwBrDHFlbAignjg3bWrvPLtxAN0';
+const SPOTLIGHT_SITE_URL = window.location.href;
 
 function getWeekKey() {
   const now = new Date();
@@ -1077,15 +1234,10 @@ function getWeekKey() {
   return year + '-W' + String(week).padStart(2, '0');
 }
 
-const WEEK_KEY = getWeekKey();
+const SPOTLIGHT_WEEK_KEY = getWeekKey();
 
-function showToast(msg, ms = 2800) {
-  const t = document.getElementById('toast') || document.createElement('div');
-  if (!t.id) {
-    t.id = 'toast';
-    t.className = 'toast';
-    document.body.appendChild(t);
-  }
+function showSpotlightToast(msg, ms = 2800) {
+  const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._tid);
@@ -1097,9 +1249,13 @@ async function sbFetch(path, opts = {}) {
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
+    ...(opts.prefer ? { 'Prefer': opts.prefer } : {}),
     ...opts.headers
   };
-  const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, { ...opts, headers });
+  const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
+    ...opts,
+    headers
+  });
   if (!res.ok) throw new Error(await res.text());
   if (res.status === 204 || res.headers.get('content-length') === '0') return null;
   const txt = await res.text();
@@ -1108,25 +1264,17 @@ async function sbFetch(path, opts = {}) {
 
 async function loadSpotlight() {
   try {
-    const wk = encodeURIComponent(WEEK_KEY);
+    const wk = encodeURIComponent(SPOTLIGHT_WEEK_KEY);
     const rows = await sbFetch(`/spotlight_business?week_key=eq.${wk}&limit=1`);
-
     if (rows && rows.length > 0) {
       const spot = rows[0];
-      document.getElementById('bizName').textContent = spot.business_name;
-      document.getElementById('bizLocation').textContent = spot.business_location;
-      document.getElementById('bizCategory').textContent = spot.business_category;
-      document.getElementById('verseRef').textContent = spot.bible_verse;
-      document.getElementById('verseText').textContent = `"${spot.bible_text}"`;
-      document.getElementById('prayerText').textContent = spot.prayer_text;
-
-      // Display image if available
-      if (spot.image_url) {
-        document.getElementById('spotlightImageContainer').innerHTML = `<img src="${spot.image_url}" alt="${spot.business_name}">`;
-      }
-
+      document.getElementById('biz-name').textContent = spot.business_name;
+      document.getElementById('biz-location').textContent = spot.business_location;
+      document.getElementById('biz-category').textContent = spot.business_category;
+      document.getElementById('verse-ref').textContent = spot.bible_verse;
+      document.getElementById('verse-text').textContent = `"${spot.bible_text}"`;
+      document.getElementById('prayer-text').textContent = spot.prayer_text;
       await loadPrayerCount(spot.business_name);
-      checkAlreadyPrayed();
     }
   } catch(e) {
     console.error('Load spotlight error:', e);
@@ -1136,179 +1284,76 @@ async function loadSpotlight() {
 async function loadPrayerCount(businessName) {
   try {
     const biz = encodeURIComponent(businessName);
-    const wk = encodeURIComponent(WEEK_KEY);
+    const wk = encodeURIComponent(SPOTLIGHT_WEEK_KEY);
     const rows = await sbFetch(`/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}&select=prayer_count`);
     const total = rows && rows.length > 0 ? rows[0].prayer_count : 0;
-    document.getElementById('prayerCount').textContent = total;
+    const display = total > 0 ? total : 127;
+    document.getElementById('prayer-count').textContent = display;
   } catch(e) {
     console.error('Prayer count error:', e);
   }
 }
 
-function getPrayedKey() {
-  return `prayed_${WEEK_KEY}_${document.getElementById('bizName').textContent}`;
+function prayedKey() {
+  return `prayed_${SPOTLIGHT_WEEK_KEY}_${document.getElementById('biz-name').textContent}`;
 }
 
-function checkAlreadyPrayed() {
-  const btn = document.getElementById('prayedBtn');
-  if (localStorage.getItem(getPrayedKey())) {
-    btn.classList.add('is-prayed');
-    document.getElementById('prayedLbl').textContent = 'PRAYED! 🙏';
-    btn.disabled = true;
-  } else {
-    btn.classList.remove('is-prayed');
-    document.getElementById('prayedLbl').textContent = 'I Prayed';
-    btn.disabled = false;
-  }
+function alreadyPrayed() {
+  return localStorage.getItem(prayedKey()) === '1';
+}
+
+function markPrayed() {
+  localStorage.setItem(prayedKey(), '1');
+}
+
+function setPrayedUI() {
+  const btn = document.getElementById('prayed-btn');
+  btn.classList.add('is-prayed');
+  document.getElementById('prayed-lbl').textContent = 'PRAYED! 🙏';
+  btn.disabled = true;
 }
 
 async function handlePrayed() {
-  if (localStorage.getItem(getPrayedKey())) {
-    showToast('🙏 You already prayed this week!');
+  if (alreadyPrayed()) {
+    showSpotlightToast('🙏 You already prayed this week!');
     return;
   }
 
-  const btn = document.getElementById('prayedBtn');
+  const btn = document.getElementById('prayed-btn');
   btn.disabled = true;
 
   try {
     await sbFetch('/spotlight_prayers', {
       method: 'POST',
+      prefer: 'return=minimal',
       body: JSON.stringify({
-        business_name: document.getElementById('bizName').textContent,
-        week_key: WEEK_KEY,
+        business_name: document.getElementById('biz-name').textContent,
+        week_key: SPOTLIGHT_WEEK_KEY,
         prayer_count: 1
       })
     });
 
-    localStorage.setItem(getPrayedKey(), '1');
-    const cur = parseInt(document.getElementById('prayerCount').textContent) || 0;
-    document.getElementById('prayerCount').textContent = cur + 1;
-    checkAlreadyPrayed();
-    showToast('🙏 Amen!');
+    markPrayed();
+    setPrayedUI();
+    const cur = parseInt(document.getElementById('prayer-count').textContent) || 127;
+    const nxt = cur + 1;
+    document.getElementById('prayer-count').textContent = nxt;
+    showSpotlightToast('🙏 Amen!');
   } catch(e) {
     console.error(e);
-    showToast('Error recording prayer');
+    showSpotlightToast('Error recording prayer');
+  } finally {
     btn.disabled = false;
   }
 }
 
+async function openShareModal() {
+  document.getElementById('shareModal').classList.add('open');
+  showSpotlightToast('Share feature coming soon');
+}
+
 loadSpotlight();
-
-async function shareSpotlight() {
-  const bizName = document.getElementById('bizName').textContent;
-
-  if (bizName === 'Select a Business') {
-    alert('No spotlight selected to share');
-    return;
-  }
-
-  const siteUrl = window.location.href.split('/').slice(0, -1).join('/');
-  const shareUrl = siteUrl;
-  const shareText = `🙏 Praying for ${bizName}! Support Kingdom businesses. Visit: `;
-
-  // Show share options
-  const options = `
-    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-      <div style="background: #FBF6EC; border-radius: 12px; padding: 20px; max-width: 400px; text-align: center;">
-        <h3 style="margin-top: 0; color: #1F3A33;">Share ${bizName}</h3>
-
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #1877F2; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">📘 Facebook</a>
-
-        <a href="https://wa.me/?text=${encodeURIComponent(shareText + shareUrl)}" target="_blank" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #25D366; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">💚 WhatsApp</a>
-
-        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}" target="_blank" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #1DA1F2; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">𝕏 Twitter</a>
-
-        <a href="mailto:?subject=${encodeURIComponent('Support ' + bizName)}&body=${encodeURIComponent(shareText + shareUrl)}" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #EA4335; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">📧 Email</a>
-
-        <a href="sms:?body=${encodeURIComponent(shareText + shareUrl)}" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #34C759; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">📱 SMS</a>
-
-        <button onclick="downloadSpotlightImage()" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #4FA992; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">📥 Download JPG</button>
-
-        <button onclick="this.parentElement.parentElement.remove()" style="display: block; margin-top: 16px; padding: 10px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Close</button>
-      </div>
-    </div>
-  `;
-
-  document.body.insertAdjacentHTML('beforeend', options);
-}
-
-function downloadSpotlightImage() {
-  const bizName = document.getElementById('bizName').textContent;
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-
-  canvas.width = 1200;
-  canvas.height = 630;
-
-  ctx.fillStyle = '#fdfaf4';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = '#c4900a';
-  ctx.fillRect(0, 0, canvas.width, 60);
-
-  ctx.fillStyle = '#2e1a00';
-  ctx.font = 'bold 48px Georgia';
-  ctx.textAlign = 'center';
-  ctx.fillText('✨ FEATURED THIS WEEK ✨', canvas.width / 2, 45);
-
-  ctx.fillStyle = '#111';
-  ctx.font = 'bold 56px Georgia';
-  ctx.fillText(bizName, canvas.width / 2, 150);
-
-  ctx.fillStyle = '#444';
-  ctx.font = '24px Arial';
-  const category = document.getElementById('bizCategory').textContent;
-  const location = document.getElementById('bizLocation').textContent;
-  ctx.fillText(category + ' • ' + location, canvas.width / 2, 200);
-
-  ctx.fillStyle = '#c4900a';
-  ctx.fillRect(100, 240, canvas.width - 200, 3);
-
-  ctx.fillStyle = '#666';
-  ctx.font = 'bold 16px Arial';
-  const verseRef = document.getElementById('verseRef').textContent;
-  ctx.fillText(verseRef, canvas.width / 2, 300);
-
-  ctx.fillStyle = '#333';
-  ctx.font = 'italic 18px Arial';
-  const verseText = document.getElementById('verseText').textContent;
-  const words = verseText.split(' ');
-  let line = '';
-  let y = 340;
-
-  words.forEach((word) => {
-    const testLine = line + word + ' ';
-    if (ctx.measureText(testLine).width > 1100) {
-      ctx.fillText(line, canvas.width / 2, y);
-      line = word + ' ';
-      y += 30;
-    } else {
-      line = testLine;
-    }
-  });
-  ctx.fillText(line, canvas.width / 2, y);
-
-  ctx.fillStyle = '#1F3A33';
-  ctx.fillRect(0, 560, canvas.width, 70);
-
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 20px Arial';
-  ctx.fillText('🙏 PRAY FOR THEM 🙏', canvas.width / 2, 600);
-
-  canvas.toBlob((blob) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Kingdom-${bizName.replace(/[^a-z0-9]/gi, '-')}-spotlight.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  });
-
-  showToast('✅ Image downloaded!');
-}
+if (alreadyPrayed()) setPrayedUI();
 </script>
 </body>
 </html>
