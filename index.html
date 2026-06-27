@@ -327,6 +327,10 @@ body { margin: 0; }
               <span class="b-icon">🙏</span>
               <span class="b-lbl" id="prayedLbl">I Prayed</span>
             </button>
+            <button class="btn-act" onclick="shareSpotlight()">
+              <span class="b-icon">📱</span>
+              <span class="b-lbl">Share</span>
+            </button>
           </div>
           <div class="prayer-bar">
             <div style="font-size: 22px;">❤️</div>
@@ -1182,6 +1186,105 @@ async function handlePrayed() {
 }
 
 loadSpotlight();
+
+async function shareSpotlight() {
+  const bizName = document.getElementById('bizName').textContent;
+
+  if (bizName === 'Select a Business') {
+    alert('No spotlight selected to share');
+    return;
+  }
+
+  // Create a canvas from the spotlight card
+  const card = document.querySelector('.spotlight-card');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Set canvas size
+  canvas.width = 1200;
+  canvas.height = 630;
+
+  // Background
+  ctx.fillStyle = '#fdfaf4';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Gold accent bar at top
+  ctx.fillStyle = '#c4900a';
+  ctx.fillRect(0, 0, canvas.width, 60);
+
+  // Title
+  ctx.fillStyle = '#2e1a00';
+  ctx.font = 'bold 48px Georgia';
+  ctx.textAlign = 'center';
+  ctx.fillText('✨ FEATURED THIS WEEK ✨', canvas.width / 2, 45);
+
+  // Business name
+  ctx.fillStyle = '#111';
+  ctx.font = 'bold 56px Georgia';
+  ctx.textAlign = 'center';
+  ctx.fillText(bizName, canvas.width / 2, 150);
+
+  // Category and location
+  ctx.fillStyle = '#444';
+  ctx.font = '24px Arial';
+  const category = document.getElementById('bizCategory').textContent;
+  const location = document.getElementById('bizLocation').textContent;
+  ctx.fillText(category + ' • ' + location, canvas.width / 2, 200);
+
+  // Divider
+  ctx.fillStyle = '#c4900a';
+  ctx.fillRect(100, 240, canvas.width - 200, 3);
+
+  // Bible verse
+  ctx.fillStyle = '#666';
+  ctx.font = 'bold 16px Arial';
+  const verseRef = document.getElementById('verseRef').textContent;
+  ctx.fillText(verseRef, canvas.width / 2, 300);
+
+  ctx.fillStyle = '#333';
+  ctx.font = 'italic 18px Arial';
+  const verseText = document.getElementById('verseText').textContent;
+  const maxWidth = canvas.width - 100;
+  const words = verseText.split(' ');
+  let line = '';
+  let y = 340;
+
+  words.forEach((word) => {
+    const testLine = line + word + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth) {
+      ctx.fillText(line, canvas.width / 2, y);
+      line = word + ' ';
+      y += 30;
+    } else {
+      line = testLine;
+    }
+  });
+  ctx.fillText(line, canvas.width / 2, y);
+
+  // Footer
+  ctx.fillStyle = '#1F3A33';
+  ctx.fillRect(0, 560, canvas.width, 70);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('🙏 PRAY FOR THEM 🙏', canvas.width / 2, 600);
+
+  // Convert to image and download
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Kingdom-${bizName.replace(/[^a-z0-9]/gi, '-')}-spotlight.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    showToast('✅ Spotlight image downloaded! Share on social media 📱');
+  });
+}
 </script>
 </body>
 </html>
