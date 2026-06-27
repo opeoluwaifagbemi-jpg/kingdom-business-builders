@@ -123,12 +123,18 @@
       <input type="file" id="businessImage" accept="image/*" onchange="startImageCrop()">
       <div id="imagePreview" style="margin-top: 12px; max-width: 100%; border-radius: 8px; overflow: hidden;"></div>
       <div id="cropContainer" style="display: none; margin-top: 12px;">
-        <canvas id="cropCanvas" style="max-width: 100%; border: 2px solid #ddd; border-radius: 8px;"></canvas>
-        <div style="margin-top: 12px; display: flex; gap: 10px;">
-          <button type="button" onclick="cropImage()" style="flex: 1; padding: 10px; background: #4FA992; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">✓ Use This Crop</button>
-          <button type="button" onclick="resetCrop()" style="flex: 1; padding: 10px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Reset</button>
+        <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" onclick="useFullImage()" style="flex: 1; min-width: 150px; padding: 10px; background: #4FA992; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">✓ Use Full Image</button>
+          <button type="button" onclick="showCropTool()" style="flex: 1; min-width: 150px; padding: 10px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">🔧 Crop Image</button>
         </div>
-        <div style="margin-top: 8px; font-size: 12px; color: #666;">Drag to move • Scroll to zoom • Click Use when ready</div>
+        <div id="cropCanvasContainer" style="display: none; margin-top: 12px;">
+          <canvas id="cropCanvas" style="max-width: 100%; border: 2px solid #ddd; border-radius: 8px;"></canvas>
+          <div style="margin-top: 12px; display: flex; gap: 10px;">
+            <button type="button" onclick="cropImage()" style="flex: 1; padding: 10px; background: #4FA992; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">✓ Use This Crop</button>
+            <button type="button" onclick="resetCrop()" style="flex: 1; padding: 10px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Reset</button>
+          </div>
+          <div style="margin-top: 8px; font-size: 12px; color: #666;">Drag to move • Scroll to zoom • Click Use when ready</div>
+        </div>
       </div>
     </div>
 
@@ -449,6 +455,29 @@ function resetCrop() {
   cropState.offsetY = 0;
   cropState.zoom = 1;
   drawCropCanvas();
+}
+
+function useFullImage() {
+  // Convert full image to compressed base64
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const img = cropState.image;
+
+  canvas.width = img.width;
+  canvas.height = img.height;
+  ctx.drawImage(img, 0, 0);
+
+  const fullImage = canvas.toDataURL('image/jpeg', 0.85);
+  window.selectedImageData = fullImage;
+
+  document.getElementById('cropContainer').style.display = 'none';
+  document.getElementById('imagePreview').innerHTML = `<img src="${fullImage}" style="width: 100%; height: auto; border-radius: 8px;">`;
+}
+
+function showCropTool() {
+  document.getElementById('cropCanvasContainer').style.display = 'block';
+  drawCropCanvas();
+  setupCropListeners();
 }
 
 function setupCropListeners() {
