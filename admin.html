@@ -379,8 +379,11 @@ function startImageCrop() {
       cropState.offsetX = 0;
       cropState.offsetY = 0;
       cropState.zoom = 1;
-      drawCropCanvas();
       document.getElementById('cropContainer').style.display = 'block';
+      setTimeout(() => {
+        drawCropCanvas();
+        setupCropListeners();
+      }, 100);
     };
     img.src = e.target.result;
   };
@@ -448,10 +451,8 @@ function resetCrop() {
   drawCropCanvas();
 }
 
-// Canvas interaction
-document.addEventListener('DOMContentLoaded', () => {
+function setupCropListeners() {
   const canvas = document.getElementById('cropCanvas');
-  if (!canvas) return;
 
   canvas.addEventListener('mousedown', (e) => {
     cropState.isDragging = true;
@@ -460,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   canvas.addEventListener('mousemove', (e) => {
-    if (!cropState.isDragging) return;
+    if (!cropState.isDragging || !cropState.image) return;
     const dx = e.clientX - cropState.lastX;
     const dy = e.clientY - cropState.lastY;
     cropState.offsetX += dx;
@@ -475,13 +476,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   canvas.addEventListener('wheel', (e) => {
+    if (!cropState.image) return;
     e.preventDefault();
     const zoom = e.deltaY > 0 ? 0.9 : 1.1;
     cropState.zoom *= zoom;
     cropState.zoom = Math.max(0.5, Math.min(3, cropState.zoom));
     drawCropCanvas();
   });
-});
+}
 
 async function uploadImage(file) {
   return new Promise((resolve, reject) => {
