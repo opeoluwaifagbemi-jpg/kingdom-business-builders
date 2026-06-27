@@ -1382,10 +1382,16 @@ async function downloadFullCard() {
       card.parentElement.style.margin = '0 auto';
 
       // Get card dimensions to capture full height (after width is set to 1200px)
-      const cardHeight = card.offsetHeight;
+      let cardHeight = card.offsetHeight;
       const cardWidth = card.offsetWidth;
 
-      // Capture with forced desktop width and exact height (no padding)
+      // Wait a moment for layout to settle
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Recalculate height after layout settles
+      cardHeight = card.offsetHeight;
+
+      // Capture with forced desktop width - ensure full height with padding
       const canvas = await html2canvas(card, {
         backgroundColor: '#fdfaf4',
         scale: 2, // High quality
@@ -1399,10 +1405,10 @@ async function downloadFullCard() {
       card.parentElement.style.width = originalWidth;
       card.style.maxWidth = originalMaxWidth;
 
-      // Create canvas with exact dimensions (no extra space)
+      // Create canvas with full height (add small buffer for footer)
       const finalCanvas = document.createElement('canvas');
       finalCanvas.width = canvas.width;
-      finalCanvas.height = canvas.height; // Exact height, tight layout
+      finalCanvas.height = Math.max(canvas.height, cardHeight * 2); // Ensure full content
 
       const ctx = finalCanvas.getContext('2d');
       ctx.fillStyle = '#fdfaf4';
