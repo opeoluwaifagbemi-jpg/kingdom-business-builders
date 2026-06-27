@@ -61,8 +61,10 @@ body { margin: 0; }
 /* SPOTLIGHT & ADMIN STYLES */
 .spotlight-section { max-width: 1080px; margin: 0 auto 20px; }
 .spotlight-card { background: #fdfaf4; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1); overflow: hidden; }
-.spotlight-top { display: grid; grid-template-columns: auto 1fr; gap: 0; }
+.spotlight-top { display: grid; grid-template-columns: auto 1fr 1fr; gap: 0; }
 .spotlight-left { background: linear-gradient(135deg, #fdfaf4 0%, #f5f0e8 100%); min-height: 140px; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.spotlight-image-container { background: #f0f0f0; min-height: 140px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.spotlight-image-container img { width: 100%; height: 100%; object-fit: cover; }
 .botw-badge { width: 120px; padding: 12px 10px 18px; background: linear-gradient(175deg, #f0c840 0%, #e8b820 30%, #c89010 100%); border-radius: 10px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 .badge-crown { font-size: 20px; margin-bottom: 4px; }
 .badge-biz { font-size: 12px; font-weight: 900; color: #2e1a00; }
@@ -316,6 +318,7 @@ body { margin: 0; }
             <div class="badge-week">★ ★ ★</div>
           </div>
         </div>
+        <div class="spotlight-image-container" id="spotlightImageContainer"></div>
         <div class="spotlight-right">
           <div class="featured-label">⭐ FEATURED THIS WEEK</div>
           <h2 class="business-name" id="bizName">Select a Business</h2>
@@ -1117,6 +1120,11 @@ async function loadSpotlight() {
       document.getElementById('verseText').textContent = `"${spot.bible_text}"`;
       document.getElementById('prayerText').textContent = spot.prayer_text;
 
+      // Display image if available
+      if (spot.image_url) {
+        document.getElementById('spotlightImageContainer').innerHTML = `<img src="${spot.image_url}" alt="${spot.business_name}">`;
+      }
+
       await loadPrayerCount(spot.business_name);
       checkAlreadyPrayed();
     }
@@ -1195,47 +1203,68 @@ async function shareSpotlight() {
     return;
   }
 
-  // Create a canvas from the spotlight card
-  const card = document.querySelector('.spotlight-card');
+  const siteUrl = window.location.href.split('/').slice(0, -1).join('/');
+  const shareUrl = siteUrl;
+  const shareText = `🙏 Praying for ${bizName}! Support Kingdom businesses. Visit: `;
+
+  // Show share options
+  const options = `
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+      <div style="background: #FBF6EC; border-radius: 12px; padding: 20px; max-width: 400px; text-align: center;">
+        <h3 style="margin-top: 0; color: #1F3A33;">Share ${bizName}</h3>
+
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" target="_blank" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #1877F2; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">📘 Facebook</a>
+
+        <a href="https://wa.me/?text=${encodeURIComponent(shareText + shareUrl)}" target="_blank" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #25D366; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">💚 WhatsApp</a>
+
+        <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}" target="_blank" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #1DA1F2; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">𝕏 Twitter</a>
+
+        <a href="mailto:?subject=${encodeURIComponent('Support ' + bizName)}&body=${encodeURIComponent(shareText + shareUrl)}" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #EA4335; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">📧 Email</a>
+
+        <a href="sms:?body=${encodeURIComponent(shareText + shareUrl)}" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #34C759; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">📱 SMS</a>
+
+        <button onclick="downloadSpotlightImage()" style="display: inline-block; margin: 8px; padding: 10px 16px; background: #4FA992; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">📥 Download JPG</button>
+
+        <button onclick="this.parentElement.parentElement.remove()" style="display: block; margin-top: 16px; padding: 10px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">Close</button>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', options);
+}
+
+function downloadSpotlightImage() {
+  const bizName = document.getElementById('bizName').textContent;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  // Set canvas size
   canvas.width = 1200;
   canvas.height = 630;
 
-  // Background
   ctx.fillStyle = '#fdfaf4';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Gold accent bar at top
   ctx.fillStyle = '#c4900a';
   ctx.fillRect(0, 0, canvas.width, 60);
 
-  // Title
   ctx.fillStyle = '#2e1a00';
   ctx.font = 'bold 48px Georgia';
   ctx.textAlign = 'center';
   ctx.fillText('✨ FEATURED THIS WEEK ✨', canvas.width / 2, 45);
 
-  // Business name
   ctx.fillStyle = '#111';
   ctx.font = 'bold 56px Georgia';
-  ctx.textAlign = 'center';
   ctx.fillText(bizName, canvas.width / 2, 150);
 
-  // Category and location
   ctx.fillStyle = '#444';
   ctx.font = '24px Arial';
   const category = document.getElementById('bizCategory').textContent;
   const location = document.getElementById('bizLocation').textContent;
   ctx.fillText(category + ' • ' + location, canvas.width / 2, 200);
 
-  // Divider
   ctx.fillStyle = '#c4900a';
   ctx.fillRect(100, 240, canvas.width - 200, 3);
 
-  // Bible verse
   ctx.fillStyle = '#666';
   ctx.font = 'bold 16px Arial';
   const verseRef = document.getElementById('verseRef').textContent;
@@ -1244,15 +1273,13 @@ async function shareSpotlight() {
   ctx.fillStyle = '#333';
   ctx.font = 'italic 18px Arial';
   const verseText = document.getElementById('verseText').textContent;
-  const maxWidth = canvas.width - 100;
   const words = verseText.split(' ');
   let line = '';
   let y = 340;
 
   words.forEach((word) => {
     const testLine = line + word + ' ';
-    const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth) {
+    if (ctx.measureText(testLine).width > 1100) {
       ctx.fillText(line, canvas.width / 2, y);
       line = word + ' ';
       y += 30;
@@ -1262,16 +1289,13 @@ async function shareSpotlight() {
   });
   ctx.fillText(line, canvas.width / 2, y);
 
-  // Footer
   ctx.fillStyle = '#1F3A33';
   ctx.fillRect(0, 560, canvas.width, 70);
 
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 20px Arial';
-  ctx.textAlign = 'center';
   ctx.fillText('🙏 PRAY FOR THEM 🙏', canvas.width / 2, 600);
 
-  // Convert to image and download
   canvas.toBlob((blob) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -1281,9 +1305,9 @@ async function shareSpotlight() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    showToast('✅ Spotlight image downloaded! Share on social media 📱');
   });
+
+  showToast('✅ Image downloaded!');
 }
 </script>
 </body>
