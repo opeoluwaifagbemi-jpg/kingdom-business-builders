@@ -1359,39 +1359,30 @@ async function downloadFullCard() {
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
     script.onload = async () => {
-      // Capture the card with high quality
+      // Force desktop layout by setting width (overrides responsive mobile layout)
+      const originalWidth = card.parentElement.style.width;
+      const originalMaxWidth = card.style.maxWidth;
+
+      // Temporarily set fixed width for desktop layout
+      card.parentElement.style.width = '1200px';
+      card.parentElement.style.margin = '0 auto';
+
+      // Capture with forced desktop width for landscape layout
       const canvas = await html2canvas(card, {
         backgroundColor: '#fdfaf4',
-        scale: 3, // High quality
+        scale: 2, // High quality
         useCORS: true,
         logging: false,
-        allowTaint: true
+        allowTaint: true,
+        windowWidth: 1200 // Force 1200px width = desktop layout
       });
 
-      // Create landscape format canvas (wider than tall)
-      const landscapeCanvas = document.createElement('canvas');
-      const ratio = canvas.width / canvas.height;
+      // Restore original styling
+      card.parentElement.style.width = originalWidth;
+      card.style.maxWidth = originalMaxWidth;
 
-      // If card is already landscape, use as-is; otherwise make landscape
-      if (ratio >= 1) {
-        landscapeCanvas.width = canvas.width;
-        landscapeCanvas.height = canvas.height;
-      } else {
-        // Convert to landscape by using card width as height
-        landscapeCanvas.width = Math.round(canvas.height * 1.5);
-        landscapeCanvas.height = canvas.height;
-      }
-
-      const ctx = landscapeCanvas.getContext('2d');
-      ctx.fillStyle = '#fdfaf4';
-      ctx.fillRect(0, 0, landscapeCanvas.width, landscapeCanvas.height);
-
-      // Center the card
-      const x = (landscapeCanvas.width - canvas.width) / 2;
-      const y = 0;
-      ctx.drawImage(canvas, x, y);
-
-      landscapeCanvas.toBlob((blob) => {
+      // Use captured canvas as-is (should already be landscape from desktop layout)
+      canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         const bizName = document.getElementById('bizName').textContent;
@@ -1401,7 +1392,7 @@ async function downloadFullCard() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        showToast('✅ High-quality landscape image downloaded!');
+        showToast('✅ Desktop landscape image downloaded!');
       }, 'image/png');
     };
     document.head.appendChild(script);
