@@ -1368,21 +1368,18 @@ async function downloadFullCard() {
       card.parentElement.style.width = '1200px';
       card.parentElement.style.margin = '0 auto';
 
-      // Get card dimensions to capture full height
+      // Get card dimensions to capture full height (after width is set to 1200px)
       const cardHeight = card.offsetHeight;
       const cardWidth = card.offsetWidth;
 
-      // Capture with forced desktop width and full height
+      // Capture with forced desktop width and exact height (no padding)
       const canvas = await html2canvas(card, {
         backgroundColor: '#fdfaf4',
         scale: 2, // High quality
         useCORS: true,
         logging: false,
         allowTaint: true,
-        windowWidth: 1200, // Force desktop width
-        windowHeight: cardHeight + 100, // Include full height + padding
-        height: cardHeight,
-        width: cardWidth
+        windowWidth: 1200 // Force desktop width
       });
 
       // Restore original styling
