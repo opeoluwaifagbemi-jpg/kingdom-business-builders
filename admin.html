@@ -285,8 +285,16 @@ async function saveSpotlight() {
     const verse = getVerseByCategory(selectedBusiness.category);
     const prayer = generatePrayer(selectedBusiness);
 
-    await sbFetch('/spotlight_business', {
+    const headers = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates'
+    };
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_business`, {
       method: 'POST',
+      headers,
       body: JSON.stringify({
         week_key: WEEK_KEY,
         business_name: selectedBusiness.name,
@@ -295,9 +303,10 @@ async function saveSpotlight() {
         bible_verse: verse.ref,
         bible_text: verse.text,
         prayer_text: prayer
-      }),
-      upsert: true
+      })
     });
+
+    if (!res.ok) throw new Error(await res.text());
 
     document.getElementById('successMsg').classList.add('show');
     setTimeout(() => {
