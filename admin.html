@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kingdom Business Builders - Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1F3A33;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container { max-width: 600px; width: 100%; }
+    .login-box {
+      background: #FBF6EC;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+    .admin-panel {
+      background: #FBF6EC;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: none;
+    }
+    .admin-panel.show { display: block; }
+    h1 { color: #1F3A33; margin-bottom: 24px; text-align: center; font-size: 28px; }
+    h2 { color: #1F3A33; margin-bottom: 20px; font-size: 20px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-weight: 700; color: #333; margin-bottom: 8px; font-size: 14px; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    input:focus, select:focus { outline: none; border-color: #4FA992; }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #4FA992;
+      color: #FBF6EC;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #3F8A78; }
+    button.secondary {
+      background: #f0f0f0;
+      color: #333;
+      margin-top: 8px;
+    }
+    button.secondary:hover { background: #e0e0e0; }
+    .error { color: #C2452E; font-size: 13px; margin-bottom: 12px; display: none; }
+    .error.show { display: block; }
+    .success { color: #1F6F5C; font-size: 13px; margin-top: 12px; display: none; }
+    .success.show { display: block; }
+    .preview {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #333;
+    }
+    .preview strong { color: #1F3A33; }
+    .loading { color: #999; font-size: 13px; margin-top: 8px; }
+    .logout-btn { background: #E2654B !important; }
+    .logout-btn:hover { background: #CC543B !important; }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #4FA992;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- LOGIN -->
+  <div class="login-box" id="loginBox">
+    <h1>⚙️ Admin Panel</h1>
+    <div class="error" id="loginError"></div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="adminPassword" placeholder="Enter password" onkeypress="if(event.key==='Enter') verifyPassword()">
+    </div>
+    <button onclick="verifyPassword()">Login</button>
+    <a href="index.html" class="back-link">← Back to Site</a>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="admin-panel" id="adminPanel">
+    <h1>🎯 Select Spotlight Business</h1>
+
+    <div class="form-group">
+      <label>Choose Business</label>
+      <select id="businessSelect" onchange="updatePreview()">
+        <option value="">Loading businesses...</option>
+      </select>
+      <div class="loading" id="loadingStatus"></div>
+    </div>
+
+    <div class="preview" id="businessPreview"></div>
+
+    <button onclick="saveSpotlight()" style="margin-top: 20px;">💾 Save as Spotlight</button>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+
+    <div class="success" id="successMsg">✅ Spotlight saved!</div>
+
+    <a href="index.html" class="back-link">← View Live Site</a>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = 'admin123';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhcesSQPAkIdZ1YwNBTZFjYyhGMOLZzbleAdxPO9Ilr8z3XZzgUphjWKTmT91wb2_BMg/exec';
+const SUPABASE_URL = 'https://ydwbyeilhdecrgezogqh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2J5ZWlsaGRlY3JnZXpvZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTg5NjAsImV4cCI6MjA5NzgzNDk2MH0.V3zGn_eiEA8-rC-FhwBrDHFlbAignjg3bWrvPLtxAN0';
+
+let allBusinesses = [];
+let selectedBusiness = null;
+
+function getWeekKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const startDate = new Date(year, 0, 1);
+  const days = Math.floor((now - startDate) / (24 * 60 * 60 * 1000));
+  const week = Math.ceil((days + startDate.getDay() + 1) / 7);
+  return year + '-W' + String(week).padStart(2, '0');
+}
+
+const WEEK_KEY = getWeekKey();
+
+function verifyPassword() {
+  const pwd = document.getElementById('adminPassword').value;
+  if (pwd === ADMIN_PASSWORD) {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('show');
+    document.getElementById('adminPassword').value = '';
+    loadAllBusinesses();
+  } else {
+    const err = document.getElementById('loginError');
+    err.textContent = '❌ Incorrect password';
+    err.classList.add('show');
+    setTimeout(() => err.classList.remove('show'), 3000);
+  }
+}
+
+function logout() {
+  document.getElementById('adminPanel').classList.remove('show');
+  document.getElementById('loginBox').style.display = 'block';
+  document.getElementById('successMsg').classList.remove('show');
+  document.getElementById('adminPassword').focus();
+}
+
+async function loadAllBusinesses() {
+  try {
+    document.getElementById('loadingStatus').textContent = 'Loading...';
+    const response = await fetch(APPS_SCRIPT_URL);
+    const data = await response.json();
+
+    if (data.success && data.listings) {
+      allBusinesses = data.listings;
+      const select = document.getElementById('businessSelect');
+      select.innerHTML = '<option value="">-- Select a business --</option>';
+
+      allBusinesses.forEach((biz, idx) => {
+        const option = document.createElement('option');
+        option.value = idx;
+        option.textContent = `${biz.name} (${biz.category})`;
+        select.appendChild(option);
+      });
+
+      document.getElementById('loadingStatus').textContent = '✓ Loaded ' + allBusinesses.length + ' businesses';
+    } else {
+      document.getElementById('loadingStatus').textContent = '❌ Error loading businesses';
+    }
+  } catch(e) {
+    console.error('Load error:', e);
+    document.getElementById('loadingStatus').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+function updatePreview() {
+  const idx = document.getElementById('businessSelect').value;
+  if (!idx) return;
+
+  selectedBusiness = allBusinesses[idx];
+  const verse = getVerseByCategory(selectedBusiness.category);
+  const prayer = generatePrayer(selectedBusiness);
+
+  const preview = document.getElementById('businessPreview');
+  preview.innerHTML = `
+    <strong>Business:</strong> ${selectedBusiness.name}<br>
+    <strong>Location:</strong> ${selectedBusiness.location || 'Location TBD'}<br>
+    <strong>Category:</strong> ${selectedBusiness.category}<br><br>
+    <strong>Bible Verse:</strong> ${verse.ref}<br>
+    "${verse.text}"<br><br>
+    <strong>Prayer:</strong><br>
+    ${prayer}
+  `;
+}
+
+function getVerseByCategory(category) {
+  const cat = (category || '').toLowerCase();
+  const verses = {
+    'food': { ref: 'Proverbs 11:25', text: 'The generous will prosper; those who refresh others will themselves be refreshed.' },
+    'lawn': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
+    'landscaping': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
+    'real estate': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
+    'beauty': { ref: 'Psalm 139:14', text: 'I praise you because I am fearfully and wonderfully made.' },
+    'health': { ref: '3 John 1:2', text: 'Dear friend, I pray that you may enjoy good health and that all may go well with you.' },
+    'finance': { ref: 'Proverbs 16:3', text: 'Commit to the Lord whatever you do, and he will establish your plans.' },
+    'business': { ref: 'Proverbs 16:3', text: 'Commit to the Lord whatever you do, and he will establish your plans.' }
+  };
+
+  for (let key in verses) {
+    if (cat.includes(key)) return verses[key];
+  }
+
+  return { ref: 'Colossians 3:23', text: 'Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.' };
+}
+
+function generatePrayer(business) {
+  const prayers = [
+    `Lord, we lift up ${business.name} to You. Bless their work, guide their decisions, and grant them wisdom to serve their community well. May their business bear fruit and glorify Your name.`,
+    `Father, we pray for the team at ${business.name}. Give them strength, integrity, and favor in all they do. Help them impact their community for good.`,
+    `God, we commit ${business.name} into Your hands. Provide for their needs, open doors for growth, and guide them with Your wisdom. Bless their efforts today.`,
+    `Almighty God, watch over ${business.name}. Guide the owners and workers with Your wisdom. May their enterprise succeed and glorify Your name in all they do.`
+  ];
+  return prayers[Math.floor(Math.random() * prayers.length)];
+}
+
+async function sbFetch(path, opts = {}) {
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    ...(opts.prefer ? { 'Prefer': opts.prefer } : {}),
+    ...opts.headers
+  };
+  const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
+    ...opts,
+    headers
+  });
+  if (!res.ok) throw new Error(await res.text());
+  if (res.status === 204 || res.headers.get('content-length') === '0') return null;
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+async function saveSpotlight() {
+  if (!selectedBusiness) {
+    alert('Please select a business');
+    return;
+  }
+
+  try {
+    const verse = getVerseByCategory(selectedBusiness.category);
+    const prayer = generatePrayer(selectedBusiness);
+
+    await sbFetch('/spotlight_business', {
+      method: 'POST',
+      body: JSON.stringify({
+        week_key: WEEK_KEY,
+        business_name: selectedBusiness.name,
+        business_category: selectedBusiness.category,
+        business_location: selectedBusiness.location || 'Location TBD',
+        bible_verse: verse.ref,
+        bible_text: verse.text,
+        prayer_text: prayer
+      }),
+      upsert: true
+    });
+
+    document.getElementById('successMsg').classList.add('show');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1500);
+  } catch(e) {
+    console.error('Save error:', e);
+    alert('❌ Error saving: ' + e.message);
+  }
+}
+
+document.getElementById('adminPassword').focus();
+</script>
+
+</body>
+</html>

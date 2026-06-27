@@ -304,14 +304,6 @@ body { margin: 0; }
 <div class="board-root">
   <div class="board-bg" aria-hidden="true"></div>
 
-  <!-- ADMIN LOGIN MODAL -->
-  <div class="admin-login" id="adminLogin">
-    <h2>🔐 Admin Panel</h2>
-    <input type="password" id="adminPassword" placeholder="Enter password" onkeypress="if(event.key==='Enter') adminLogin()">
-    <button onclick="adminLogin()">Login</button>
-    <button onclick="closeAdmin()" style="background:#f0f0f0; color:#333; margin-top:8px;">Cancel</button>
-  </div>
-
   <!-- SPOTLIGHT SECTION -->
   <div class="spotlight-section">
     <div class="spotlight-card">
@@ -331,14 +323,13 @@ body { margin: 0; }
           <div class="category-pill" id="bizCategory">-</div>
           <div class="heart-divider">💛</div>
           <div class="action-btns">
-            <button class="btn-act" id="prayedBtn" onclick="handlePrayed()">
+            <button class="btn-act" id="prayedBtn" onclick="handlePrayed()" style="flex: 0.5;">
               <span class="b-icon">🙏</span>
               <span class="b-lbl" id="prayedLbl">I Prayed</span>
             </button>
-            <button class="btn-act" onclick="toggleAdmin()">
-              <span class="b-icon">⚙️</span>
-              <span class="b-lbl">Admin</span>
-            </button>
+            <a href="admin.html" class="btn-act" style="flex: 0.5; display: flex; align-items: center; justify-content: center; text-decoration: none; color: inherit;">
+              <span>⚙️</span>
+            </a>
           </div>
           <div class="prayer-bar">
             <div style="font-size: 22px;">❤️</div>
@@ -1069,13 +1060,9 @@ updateSetupBanner();
 updateOfflineBanner();
 switchView('board');
 
-/* ===================== SPOTLIGHT & ADMIN ===================== */
-const ADMIN_PASSWORD = 'admin123';
+/* ===================== SPOTLIGHT (PUBLIC) ===================== */
 const SUPABASE_URL = 'https://ydwbyeilhdecrgezogqh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2J5ZWlsaGRlY3JnZXpvZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTg5NjAsImV4cCI6MjA5NzgzNDk2MH0.V3zGn_eiEA8-rC-FhwBrDHFlbAignjg3bWrvPLtxAN0';
-
-let allBusinesses = [];
-let selectedBusiness = null;
 
 function getWeekKey() {
   const now = new Date();
@@ -1101,107 +1088,6 @@ function showToast(msg, ms = 2800) {
   t._tid = setTimeout(() => t.classList.remove('show'), ms);
 }
 
-function toggleAdmin() {
-  document.getElementById('adminLogin').classList.add('show');
-  document.getElementById('adminPassword').focus();
-}
-
-function closeAdmin() {
-  document.getElementById('adminLogin').classList.remove('show');
-  document.getElementById('adminPassword').value = '';
-}
-
-function adminLogin() {
-  const pwd = document.getElementById('adminPassword').value;
-  if (pwd === ADMIN_PASSWORD) {
-    closeAdmin();
-    showAdminPanel();
-  } else {
-    showToast('❌ Wrong password');
-  }
-}
-
-async function showAdminPanel() {
-  const biz = prompt('Select business number (1-14) or name:');
-  if (!biz) return;
-
-  try {
-    const response = await fetch(APPS_SCRIPT_URL);
-    const data = await response.json();
-    if (!data.success || !data.listings) {
-      showToast('Error loading businesses');
-      return;
-    }
-
-    allBusinesses = data.listings;
-    let selected = null;
-
-    if (!isNaN(biz)) {
-      selected = allBusinesses[parseInt(biz) - 1];
-    } else {
-      selected = allBusinesses.find(b => b.name.toLowerCase().includes(biz.toLowerCase()));
-    }
-
-    if (selected) {
-      selectedBusiness = selected;
-      displaySpotlight(selected);
-      showToast('✅ Spotlight updated!');
-    } else {
-      showToast('❌ Business not found');
-    }
-  } catch(e) {
-    console.error(e);
-    showToast('Error updating spotlight');
-  }
-}
-
-function getVerseByCategory(category) {
-  const cat = (category || '').toLowerCase();
-  const verses = {
-    'food': { ref: 'Proverbs 11:25', text: 'The generous will prosper; those who refresh others will themselves be refreshed.' },
-    'lawn': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
-    'landscaping': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
-    'real estate': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
-    'beauty': { ref: 'Psalm 139:14', text: 'I praise you because I am fearfully and wonderfully made.' },
-    'health': { ref: '3 John 1:2', text: 'Dear friend, I pray that you may enjoy good health and that all may go well with you.' },
-    'finance': { ref: 'Proverbs 16:3', text: 'Commit to the Lord whatever you do, and he will establish your plans.' },
-    'business': { ref: 'Proverbs 16:3', text: 'Commit to the Lord whatever you do, and he will establish your plans.' }
-  };
-
-  for (let key in verses) {
-    if (cat.includes(key)) return verses[key];
-  }
-
-  return { ref: 'Colossians 3:23', text: 'Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.' };
-}
-
-function generatePrayer(business) {
-  const prayers = [
-    `Lord, we lift up ${business.name} to You. Bless their work, guide their decisions, and grant them wisdom to serve their community well. May their business bear fruit and glorify Your name.`,
-    `Father, we pray for the team at ${business.name}. Give them strength, integrity, and favor in all they do. Help them impact their community for good.`,
-    `God, we commit ${business.name} into Your hands. Provide for their needs, open doors for growth, and guide them with Your wisdom. Bless their efforts today.`,
-    `Almighty God, watch over ${business.name}. Guide the owners and workers with Your wisdom. May their enterprise succeed and glorify Your name in all they do.`
-  ];
-  return prayers[Math.floor(Math.random() * prayers.length)];
-}
-
-function displaySpotlight(business) {
-  const verse = getVerseByCategory(business.category);
-  const prayer = generatePrayer(business);
-
-  document.getElementById('bizName').textContent = business.name;
-  document.getElementById('bizLocation').textContent = business.location || 'Location TBD';
-  document.getElementById('bizCategory').textContent = business.category;
-  document.getElementById('verseRef').textContent = verse.ref;
-  document.getElementById('verseText').textContent = `"${verse.text}"`;
-  document.getElementById('prayerText').textContent = prayer;
-
-  loadPrayerCount(business.name);
-  checkAlreadyPrayed();
-
-  localStorage.setItem('spotlight_' + WEEK_KEY, JSON.stringify(business));
-}
-
 async function sbFetch(path, opts = {}) {
   const headers = {
     'apikey': SUPABASE_KEY,
@@ -1214,6 +1100,28 @@ async function sbFetch(path, opts = {}) {
   if (res.status === 204 || res.headers.get('content-length') === '0') return null;
   const txt = await res.text();
   return txt ? JSON.parse(txt) : null;
+}
+
+async function loadSpotlight() {
+  try {
+    const wk = encodeURIComponent(WEEK_KEY);
+    const rows = await sbFetch(`/spotlight_business?week_key=eq.${wk}&limit=1`);
+
+    if (rows && rows.length > 0) {
+      const spot = rows[0];
+      document.getElementById('bizName').textContent = spot.business_name;
+      document.getElementById('bizLocation').textContent = spot.business_location;
+      document.getElementById('bizCategory').textContent = spot.business_category;
+      document.getElementById('verseRef').textContent = spot.bible_verse;
+      document.getElementById('verseText').textContent = `"${spot.bible_text}"`;
+      document.getElementById('prayerText').textContent = spot.prayer_text;
+
+      await loadPrayerCount(spot.business_name);
+      checkAlreadyPrayed();
+    }
+  } catch(e) {
+    console.error('Load spotlight error:', e);
+  }
 }
 
 async function loadPrayerCount(businessName) {
@@ -1276,24 +1184,7 @@ async function handlePrayed() {
   }
 }
 
-async function initSpotlight() {
-  try {
-    const response = await fetch(APPS_SCRIPT_URL);
-    const data = await response.json();
-    if (data.success && data.listings && data.listings.length > 0) {
-      const saved = localStorage.getItem('spotlight_' + WEEK_KEY);
-      if (saved) {
-        displaySpotlight(JSON.parse(saved));
-      } else {
-        displaySpotlight(data.listings[0]);
-      }
-    }
-  } catch(e) {
-    console.error('Init error:', e);
-  }
-}
-
-initSpotlight();
+loadSpotlight();
 </script>
 </body>
 </html>
