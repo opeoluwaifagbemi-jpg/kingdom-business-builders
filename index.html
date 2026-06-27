@@ -107,9 +107,6 @@ body { margin: 0; }
 @media (max-width: 768px) {
   .spotlight-top { grid-template-columns: 1fr; }
   .business-name { font-size: 28px; }
-  .spotlight-footer { grid-template-columns: 1fr; width: 100%; }
-  .footer-col { border-right: none; border-bottom: 1px solid #e4dfd4; flex-direction: column; width: 100%; }
-  .footer-col:last-child { border-bottom: none; }
 }
 
 .tabs { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 22px; }
@@ -297,11 +294,22 @@ body { margin: 0; }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
+@media (max-width: 768px) {
+  .footer-col { padding: 8px 6px !important; }
+  .verse-ref { font-size: 12px !important; }
+  .verse-text { font-size: 10px !important; }
+  .prayer-text { font-size: 10px !important; }
+}
+
 @media (max-width: 480px) {
   .board-header h1 { font-size: 36px; }
   .form-card { padding: 24px 18px 20px; }
   .spotlight-left { min-height: 160px; }
   .spotlight-image-container { min-height: 160px; }
+  .footer-col { padding: 6px 4px !important; gap: 4px !important; }
+  .verse-ref { font-size: 10px !important; }
+  .verse-text { font-size: 9px !important; }
+  .prayer-text { font-size: 9px !important; }
 }
 </style>
 </head>
