@@ -1367,22 +1367,40 @@ async function downloadFullCard() {
       card.parentElement.style.width = '1200px';
       card.parentElement.style.margin = '0 auto';
 
-      // Capture with forced desktop width for landscape layout
+      // Get card dimensions to capture full height
+      const cardHeight = card.offsetHeight;
+      const cardWidth = card.offsetWidth;
+
+      // Capture with forced desktop width and full height
       const canvas = await html2canvas(card, {
         backgroundColor: '#fdfaf4',
         scale: 2, // High quality
         useCORS: true,
         logging: false,
         allowTaint: true,
-        windowWidth: 1200 // Force 1200px width = desktop layout
+        windowWidth: 1200, // Force desktop width
+        windowHeight: cardHeight + 100, // Include full height + padding
+        height: cardHeight,
+        width: cardWidth
       });
 
       // Restore original styling
       card.parentElement.style.width = originalWidth;
       card.style.maxWidth = originalMaxWidth;
 
-      // Use captured canvas as-is (should already be landscape from desktop layout)
-      canvas.toBlob((blob) => {
+      // Create canvas with padding for verse and prayer text
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = canvas.width;
+      finalCanvas.height = Math.max(canvas.height, 800); // Minimum height to show all text
+
+      const ctx = finalCanvas.getContext('2d');
+      ctx.fillStyle = '#fdfaf4';
+      ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+      // Draw the captured card
+      ctx.drawImage(canvas, 0, 0);
+
+      finalCanvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         const bizName = document.getElementById('bizName').textContent;
