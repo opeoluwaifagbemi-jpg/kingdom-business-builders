@@ -86,7 +86,8 @@ body { margin: 0; }
 .prayer-bar { background: #1e3d1e; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; color: #fff; }
 .pb-num { font-size: 20px; font-weight: 900; line-height: 1; }
 .pb-label { font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.88; }
-.spotlight-footer { border-top: 1px solid #e4dfd4; display: grid; grid-template-columns: 1fr 1fr 1fr; background: #fdfaf4; width: 100%; }
+.spotlight-footer { border-top: 1px solid #e4dfd4; background: #fdfaf4; width: 100%; }
+.footer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #e4dfd4; }
 .footer-col { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 12px; border-right: 1px solid #e4dfd4; min-width: 0; word-wrap: break-word; overflow-wrap: break-word; }
 .footer-col:last-child { border-right: none; }
 .footer-icon { font-size: 14px; flex-shrink: 0; }
@@ -295,10 +296,12 @@ body { margin: 0; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 @media (max-width: 768px) {
-  .footer-col { padding: 8px 6px !important; }
-  .verse-ref { font-size: 12px !important; }
-  .verse-text { font-size: 10px !important; }
-  .prayer-text { font-size: 10px !important; }
+  .footer-grid { grid-template-columns: repeat(3, minmax(100px, 1fr)); gap: 0; font-size: 85%; }
+  .footer-col { padding: 6px 4px !important; }
+  .verse-ref { font-size: 11px !important; }
+  .verse-text { font-size: 9px !important; }
+  .prayer-text { font-size: 9px !important; }
+  .footer-icon { font-size: 16px !important; }
 }
 
 @media (max-width: 480px) {
@@ -350,7 +353,7 @@ body { margin: 0; }
         </div>
       </div>
       <div class="spotlight-footer" style="grid-template-columns: 1fr; border-top: none;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid #e4dfd4;">
+        <div class="footer-grid">
           <div class="footer-col" style="border-right: 1px solid #e4dfd4;">
             <div class="footer-icon">📖</div>
             <div>
