@@ -352,11 +352,8 @@ body { margin: 0; }
             <div class="verse-text" id="verseText">-</div>
           </div>
         </div>
-        <div class="footer-col" style="border-left: 1px solid #e4dfd4; border-right: 1px solid #e4dfd4;">
-          <div style="text-align: center; width: 100%;">
-            <div style="font-size: 11px; font-weight: 700; color: #333; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px;">SUPPORT. PRAY. SHARE.</div>
-            <div style="font-size: 10px; color: #666; font-style: italic;">Build His Kingdom Together.</div>
-          </div>
+        <div class="footer-col" style="border-left: 1px solid #e4dfd4; border-right: 1px solid #e4dfd4; justify-content: center;">
+          <button onclick="downloadFullCard()" style="background: #4FA992; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; letter-spacing: 1px;">📥 DOWNLOAD CARD</button>
         </div>
         <div class="footer-col" style="border-left: none;">
           <div class="footer-icon">🙏</div>
@@ -1125,7 +1122,8 @@ async function loadSpotlight() {
         document.getElementById('spotlightImageContainer').innerHTML = `<img src="${spot.image_url}" alt="${spot.business_name}">`;
       }
 
-      await loadPrayerCount(spot.business_name);
+      // Load prayer count asynchronously (non-blocking)
+      loadPrayerCount(spot.business_name);
       checkAlreadyPrayed();
     }
   } catch(e) {
@@ -1142,6 +1140,7 @@ async function loadPrayerCount(businessName) {
     document.getElementById('prayerCount').textContent = total;
   } catch(e) {
     console.error('Prayer count error:', e);
+    document.getElementById('prayerCount').textContent = '0';
   }
 }
 
@@ -1194,6 +1193,45 @@ async function handlePrayed() {
 }
 
 loadSpotlight();
+
+async function downloadFullCard() {
+  const card = document.querySelector('.spotlight-card');
+  if (!card) {
+    alert('Card not ready');
+    return;
+  }
+
+  try {
+    // Use html2canvas to capture the card exactly as displayed
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload = async () => {
+      const canvas = await html2canvas(card, {
+        backgroundColor: '#fdfaf4',
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const bizName = document.getElementById('bizName').textContent;
+        link.href = url;
+        link.download = `Kingdom-${bizName.replace(/[^a-z0-9]/gi, '-')}-spotlight.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast('✅ Card downloaded!');
+      });
+    };
+    document.head.appendChild(script);
+  } catch (e) {
+    console.error('Download error:', e);
+    alert('Error downloading card');
+  }
+}
 
 async function shareSpotlight() {
   const bizName = document.getElementById('bizName').textContent;
