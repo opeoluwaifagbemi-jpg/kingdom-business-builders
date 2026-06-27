@@ -1389,10 +1389,10 @@ async function downloadFullCard() {
       card.parentElement.style.width = originalWidth;
       card.style.maxWidth = originalMaxWidth;
 
-      // Create canvas with padding for verse and prayer text
+      // Create canvas with exact dimensions (no extra space)
       const finalCanvas = document.createElement('canvas');
       finalCanvas.width = canvas.width;
-      finalCanvas.height = Math.max(canvas.height, 800); // Minimum height to show all text
+      finalCanvas.height = canvas.height; // Exact height, tight layout
 
       const ctx = finalCanvas.getContext('2d');
       ctx.fillStyle = '#fdfaf4';
