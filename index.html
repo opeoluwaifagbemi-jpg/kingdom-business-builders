@@ -1233,25 +1233,26 @@ async function downloadStoryImage(platform) {
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   script.onload = async () => {
     const card = document.querySelector('.spotlight-card');
+    const bizName = document.getElementById('bizName').textContent;
+    const siteUrl = window.location.href.split('/').slice(0, -1).join('/');
 
     // Platform-specific dimensions
     const sizes = {
-      instagram: { width: 1080, height: 1920 }, // Instagram Story vertical
-      whatsapp: { width: 1080, height: 1920 },  // WhatsApp Story vertical
-      facebook: { width: 1080, height: 1920 },  // Facebook Story vertical
-      general: { width: 1200, height: 630 }     // General square-ish
+      instagram: { width: 1080, height: 1920 },
+      whatsapp: { width: 1080, height: 1920 },
+      facebook: { width: 1080, height: 1920 },
+      general: { width: 1200, height: 630 }
     };
 
     const size = sizes[platform] || sizes.general;
 
     const canvas = await html2canvas(card, {
       backgroundColor: '#fdfaf4',
-      scale: size.width / 400, // Scale based on target width
+      scale: size.width / 400,
       useCORS: true,
       logging: false
     });
 
-    // Create new canvas with desired dimensions
     const finalCanvas = document.createElement('canvas');
     finalCanvas.width = size.width;
     finalCanvas.height = size.height;
@@ -1260,22 +1261,51 @@ async function downloadStoryImage(platform) {
     ctx.fillStyle = '#fdfaf4';
     ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-    // Center the card on the canvas
     const x = (finalCanvas.width - canvas.width) / 2;
     const y = (finalCanvas.height - canvas.height) / 2;
     ctx.drawImage(canvas, x, y);
 
-    finalCanvas.toBlob((blob) => {
+    finalCanvas.toBlob(async (blob) => {
+      const file = new File([blob], `Kingdom-${bizName}.png`, { type: 'image/png' });
+
+      // Try Web Share API first (works on mobile for most platforms)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `Support ${bizName}`,
+            text: `🙏 Praying for ${bizName}! Support Kingdom businesses. Visit: ${siteUrl}`,
+            files: [file]
+          });
+          showToast(`✅ Shared to ${platform}!`);
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') console.error('Share failed:', err);
+        }
+      }
+
+      // Fallback: Open platform-specific share URLs or download
+      const shareText = `🙏 Praying for ${bizName}! Support Kingdom businesses. ${siteUrl}`;
+      const shareUrls = {
+        instagram: `https://www.instagram.com/`,
+        whatsapp: `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`,
+        general: null
+      };
+
+      if (shareUrls[platform]) {
+        window.open(shareUrls[platform], '_blank');
+        showToast(`📱 Open the app to attach the image and share!`);
+      }
+
+      // Always provide download option
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      const bizName = document.getElementById('bizName').textContent.replace(/[^a-z0-9]/gi, '-');
       link.href = url;
       link.download = `Kingdom-${bizName}-${platform}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      showToast(`✅ ${platform.charAt(0).toUpperCase() + platform.slice(1)} image ready!`);
     });
   };
   document.head.appendChild(script);
