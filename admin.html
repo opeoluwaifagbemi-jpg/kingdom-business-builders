@@ -285,32 +285,50 @@ async function saveSpotlight() {
     const verse = getVerseByCategory(selectedBusiness.category);
     const prayer = generatePrayer(selectedBusiness);
 
-    // First, delete any existing spotlight for this week
     const wk = encodeURIComponent(WEEK_KEY);
-    try {
-      await sbFetch(`/spotlight_business?week_key=eq.${wk}`, { method: 'DELETE' });
-    } catch(e) {
-      console.log('No existing record to delete');
-    }
+    const updateData = {
+      business_name: selectedBusiness.name,
+      business_category: selectedBusiness.category,
+      business_location: selectedBusiness.location || 'Location TBD',
+      bible_verse: verse.ref,
+      bible_text: verse.text,
+      prayer_text: prayer,
+      updated_at: new Date().toISOString()
+    };
 
-    // Then insert the new one
-    await sbFetch('/spotlight_business', {
-      method: 'POST',
-      body: JSON.stringify({
-        week_key: WEEK_KEY,
-        business_name: selectedBusiness.name,
-        business_category: selectedBusiness.category,
-        business_location: selectedBusiness.location || 'Location TBD',
-        bible_verse: verse.ref,
-        bible_text: verse.text,
-        prayer_text: prayer
-      })
+    // Try UPDATE first
+    const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_business?week_key=eq.${wk}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(updateData)
     });
 
-    document.getElementById('successMsg').classList.add('show');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 1500);
+    if (updateRes.status === 204 || updateRes.status === 200) {
+      // Update succeeded
+      document.getElementById('successMsg').classList.add('show');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } else {
+      // No rows updated, so INSERT
+      await sbFetch('/spotlight_business', {
+        method: 'POST',
+        body: JSON.stringify({
+          week_key: WEEK_KEY,
+          ...updateData
+        })
+      });
+
+      document.getElementById('successMsg').classList.add('show');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    }
   } catch(e) {
     console.error('Save error:', e);
     alert('❌ Error saving: ' + e.message);
