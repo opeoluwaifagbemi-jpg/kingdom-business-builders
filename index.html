@@ -1,1042 +1,953 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kingdom Business Builders – Weekly Spotlight</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: #1F3A33;
-      min-height: 100vh;
-      padding: 32px 16px;
-    }
-
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 40px;
-      color: #FBF6EC;
-    }
-
-    .page-header h1 {
-      font-family: Georgia, serif;
-      font-size: 48px;
-      margin: 0 0 8px;
-      font-weight: 700;
-    }
-
-    .page-header p {
-      margin: 0;
-      font-size: 13px;
-      color: #C9D6D0;
-    }
-
-    /* ===================== ADMIN SECTION ===================== */
-    .admin-login {
-      display: none;
-      max-width: 500px;
-      margin: 60px auto;
-      background: #FBF6EC;
-      border-radius: 12px;
-      padding: 40px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-
-    .admin-login.show {
-      display: block;
-    }
-
-    .admin-login h2 {
-      color: #1F3A33;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 28px;
-    }
-
-    .admin-login input, .admin-login select {
-      width: 100%;
-      padding: 12px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      margin-bottom: 16px;
-    }
-
-    .admin-login input:focus, .admin-login select:focus {
-      outline: none;
-      border-color: #4FA992;
-    }
-
-    .admin-login button {
-      width: 100%;
-      padding: 14px;
-      background: #4FA992;
-      color: #FBF6EC;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .admin-login button:hover {
-      background: #3F8A78;
-    }
-
-    .admin-login .error {
-      color: #C2452E;
-      font-size: 13px;
-      margin-bottom: 12px;
-      display: none;
-    }
-
-    .admin-login .error.show {
-      display: block;
-    }
-
-    /* ===================== ADMIN PANEL ===================== */
-    .admin-panel {
-      display: none;
-      max-width: 600px;
-      margin: 40px auto;
-      background: #FBF6EC;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-
-    .admin-panel.show {
-      display: block;
-    }
-
-    .admin-panel h2 {
-      color: #1F3A33;
-      margin-bottom: 24px;
-      font-size: 24px;
-    }
-
-    .admin-panel .section {
-      margin-bottom: 24px;
-    }
-
-    .admin-panel .section label {
-      display: block;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .admin-panel select {
-      width: 100%;
-      padding: 12px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      background: #fff;
-    }
-
-    .admin-panel .loading {
-      color: #999;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-
-    .admin-panel .preview {
-      background: #f9f9f9;
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 16px;
-      font-size: 13px;
-      line-height: 1.6;
-      color: #333;
-    }
-
-    .admin-panel .preview strong {
-      color: #1F3A33;
-    }
-
-    .admin-panel .buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-
-    .admin-panel button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    .admin-panel .btn-save {
-      background: #4FA992;
-      color: #FBF6EC;
-    }
-
-    .admin-panel .btn-save:hover {
-      background: #3F8A78;
-    }
-
-    .admin-panel .btn-logout {
-      background: #f0f0f0;
-      color: #333;
-    }
-
-    .admin-panel .btn-logout:hover {
-      background: #e0e0e0;
-    }
-
-    .admin-panel .success {
-      color: #1F6F5C;
-      font-size: 13px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .admin-panel .success.show {
-      display: block;
-    }
-
-    /* ===================== SPOTLIGHT CARD ===================== */
-    .card {
-      background: #fdfaf4;
-      border-radius: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 16px 56px rgba(0,0,0,0.13);
-      width: 100%;
-      overflow: hidden;
-      margin-bottom: 50px;
-    }
-
-    .card-top {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
-
-    .panel-left {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      background:
-        repeating-linear-gradient(
-          45deg,
-          transparent,
-          transparent 100px,
-          rgba(240,200,64,0.08) 100px,
-          rgba(240,200,64,0.08) 200px
-        ),
-        linear-gradient(135deg, #fdfaf4 0%, #f5f0e8 100%);
-      position: relative;
-      min-height: 370px;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      overflow: hidden;
-    }
-
-    .panel-left::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          -45deg,
-          transparent 0,
-          transparent 60px,
-          rgba(232,184,32,0.04) 60px,
-          rgba(232,184,32,0.04) 120px
-        );
-      pointer-events: none;
-    }
-
-    .botw-badge {
-      position: relative;
-      z-index: 10;
-      width: 280px;
-      padding: 30px 20px 50px;
-      clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
-      background: linear-gradient(175deg, #f0c840 0%, #e8b820 30%, #c89010 100%);
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-
-    .badge-crown { font-size: 48px; margin-bottom: 8px; }
-    .badge-biz { font-size: 28px; font-weight: 900; color: #2e1a00; letter-spacing: 0.6px; line-height: 1.1; }
-    .badge-of { font-size: 12px; color: #5a3800; letter-spacing: 3px; margin: 6px 0; text-transform: uppercase; }
-    .badge-week { font-size: 28px; font-weight: 900; color: #2e1a00; letter-spacing: 0.6px; }
-    .badge-stars { font-size: 16px; color: #5a3800; letter-spacing: 6px; margin-top: 10px; }
-
-    .panel-right {
-      padding: 36px 40px 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .featured-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #c4900a;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-
-    .business-name {
-      font-family: Georgia, serif;
-      font-size: 42px;
-      font-weight: 700;
-      color: #111;
-      line-height: 1.05;
-      margin-bottom: 14px;
-    }
-
-    .biz-location {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #444;
-      font-size: 15px;
-      font-weight: 500;
-      margin-bottom: 10px;
-    }
-
-    .category-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f2efe8;
-      border: 1px solid #dbd5c5;
-      border-radius: 22px;
-      padding: 6px 16px;
-      font-size: 13px;
-      color: #3a3a3a;
-      margin-bottom: 20px;
-      font-weight: 500;
-    }
-
-    .heart-divider { text-align: center; color: #c4900a; font-size: 24px; margin-bottom: 18px; }
-
-    .action-btns {
-      display: flex;
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .btn-act {
-      flex: 1;
-      background: #fff;
-      border: 1.5px solid #e4dfd4;
-      border-radius: 14px;
-      padding: 18px 12px 15px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.18s;
-      font-family: inherit;
-    }
-
-    .btn-act:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 16px rgba(0,0,0,0.1);
-    }
-
-    .btn-act .b-icon { font-size: 32px; display: block; margin-bottom: 6px; }
-    .btn-act .b-lbl { font-size: 11px; font-weight: 800; color: #333; letter-spacing: 1.8px; text-transform: uppercase; }
-
-    .btn-act.is-prayed {
-      background: #eef7ee;
-      border-color: #b8d8b8;
-    }
-
-    .btn-act.is-prayed .b-lbl { color: #286028; }
-
-    .prayer-bar {
-      background: #1e3d1e;
-      border-radius: 14px;
-      padding: 18px 22px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      color: #fff;
-    }
-
-    .pb-icon { font-size: 24px; }
-    .pb-num { font-size: 40px; font-weight: 900; line-height: 1; }
-    .pb-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.88; }
-
-    /* ===================== FOOTER ===================== */
-    .card-footer {
-      border-top: 1px solid #e4dfd4;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      background: #fdfaf4;
-    }
-
-    .footer-col {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 20px 22px;
-      border-right: 1px solid #e4dfd4;
-    }
-
-    .footer-col:last-child { border-right: none; }
-
-    .footer-icon { font-size: 26px; flex-shrink: 0; }
-
-    .footer-text { line-height: 1.4; }
-
-    .verse-ref { font-size: 10px; font-weight: 700; color: #666; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-
-    .verse-text, .prayer-text { font-size: 13px; color: #333; font-style: italic; line-height: 1.5; }
-
-    .tagline-box { text-align: center; }
-
-    .tagline-main { font-size: 12px; font-weight: 700; color: #333; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
-
-    .tagline-sub { font-size: 11px; color: #666; font-style: italic; }
-
-    /* ===================== SHARE MODAL ===================== */
-    .shareModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-
-    .shareModal.open { display: flex; }
-
-    .share-content {
-      background: #fdfaf4;
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .share-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #333; }
-
-    #img-preview { width: 100%; margin-bottom: 16px; text-align: center; }
-
-    #img-preview img { max-width: 100%; border-radius: 8px; }
-
-    .preview-msg { padding: 32px; color: #999; font-size: 14px; }
-
-    .share-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-    .share-btn {
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 12px 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      text-align: center;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-family: inherit;
-    }
-
-    .share-btn:hover { background: #efefef; }
-
-    .share-btn-icon { font-size: 22px; }
-
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(120px);
-      background: #333;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      pointer-events: none;
-      transition: transform 0.3s;
-      z-index: 3000;
-    }
-
-    .toast.show { transform: translateX(-50%) translateY(0); }
-
-    .admin-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #FBF6EC;
-      color: #1F3A33;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 12px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-
-    .admin-btn:hover { background: #F0E7D8; }
-
-    @media (max-width: 768px) {
-      .card-top { grid-template-columns: 1fr; }
-      .business-name { font-size: 32px; }
-      .panel-right { padding: 24px 20px; }
-      .card-footer { grid-template-columns: 1fr; }
-      .footer-col { border-right: none; border-bottom: 1px solid #e4dfd4; }
-      .footer-col:last-child { border-bottom: none; }
-      .admin-btn { position: static; margin-bottom: 20px; width: 100%; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kingdom Business Builders</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+* { box-sizing: border-box; }
+
+body { margin: 0; }
+
+.board-root {
+  position: relative;
+  min-height: 100vh;
+  background: #1F3A33;
+  font-family: 'Inter', sans-serif;
+  color: #26211A;
+  padding: 48px 20px 32px;
+  overflow-x: hidden;
+}
+
+.board-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.025) 0, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0, transparent 45%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+  pointer-events: none;
+}
+
+.icon { stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; flex-shrink: 0; }
+.icon.spin { animation: spin 1s linear infinite; }
+
+.board-header { position: relative; text-align: center; max-width: 560px; margin: 0 auto 22px; }
+
+.eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #B8C9C2; margin: 0 0 6px;
+}
+
+.board-header h1 {
+  font-family: 'Caveat', cursive; font-weight: 700;
+  font-size: clamp(38px, 8vw, 56px); color: #FBF6EC; margin: 0 0 8px; line-height: 1.05;
+}
+
+.subhead { font-size: 13.5px; color: #C9D6D0; margin: 0; }
+
+.setup-banner, .offline-banner {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  max-width: 480px; margin: 0 auto 16px; padding: 9px 16px;
+  border-radius: 8px; font-size: 12px; text-align: center;
+}
+.offline-banner { background: rgba(232,162,61,0.16); border: 1px solid rgba(232,162,61,0.35); color: #F0D9A8; }
+.setup-banner { background: rgba(94,160,201,0.18); border: 1px solid rgba(94,160,201,0.4); color: #CFE6F2; }
+.hidden { display: none !important; }
+
+.tabs { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 22px; }
+
+.tab {
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  padding: 9px 18px; border: none; border-radius: 8px 8px 0 0;
+  background: rgba(251,246,236,0.12); color: #DCE7E2; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.tab:hover { background: rgba(251,246,236,0.2); }
+.tab-active { background: #FBF6EC; color: #26211A; transform: translateY(2px); }
+
+.board-main { position: relative; max-width: 920px; margin: 0 auto; }
+
+.card {
+  background: #FBF6EC; border-radius: 3px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.28), 0 1px 0 rgba(255,255,255,0.4) inset;
+  position: relative;
+}
+
+.thumbtack {
+  position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.form-card { max-width: 460px; margin: 0 auto; padding: 30px 26px 26px; transform: rotate(-0.6deg); }
+
+.field { display: block; margin-bottom: 18px; }
+
+.field-label {
+  display: flex; align-items: baseline; gap: 6px;
+  font-size: 12.5px; font-weight: 600; color: #5B5142;
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;
+}
+.field-label em { font-style: normal; font-weight: 400; text-transform: none; color: #9C9382; font-size: 11px; }
+.field-hint { margin-left: auto; font-weight: 400; text-transform: none; color: #9C9382; font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+
+.field input, .field textarea {
+  width: 100%; font-family: 'Inter', sans-serif; font-size: 14.5px;
+  padding: 9px 2px; border: none; border-bottom: 1.5px solid #D8CDB4;
+  background: transparent; outline: none; transition: border-color 0.15s ease; color: #26211A;
+}
+.field input::placeholder { color: #B7AD96; }
+.field input:focus { border-bottom-color: #E2654B; }
+
+.other-input { margin-top: 10px; }
+
+.field-error { display: none; margin-top: 5px; font-size: 11.5px; color: #C2452E; }
+.field-error.visible { display: block; }
+
+.pill-group { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px; border-radius: 999px; border: 1.5px solid #D8CDB4;
+  background: transparent; font-size: 12.5px; font-weight: 600; color: #5B5142;
+  cursor: pointer; transition: all 0.15s ease;
+}
+.pill:hover { border-color: #BBAE8C; }
+.pill-active { color: #FBF6EC; }
+
+.photo-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+.photo-thumb { position: relative; width: 64px; height: 64px; border-radius: 4px; overflow: hidden; border: 1px solid #D8CDB4; flex-shrink: 0; }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-thumb-remove {
+  position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(38,33,26,0.75); color: #FBF6EC; border: none; display: flex;
+  align-items: center; justify-content: center; cursor: pointer; padding: 0;
+}
+.photo-thumb-remove:hover { background: #C2452E; }
+
+.add-photo-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  width: 64px; height: 64px; border: 1.5px dashed #D8CDB4; border-radius: 4px;
+  background: transparent; color: #9C9382; cursor: pointer; font-size: 10px; flex-shrink: 0;
+  font-family: 'Inter', sans-serif; transition: border-color 0.15s ease, color 0.15s ease;
+}
+.add-photo-btn:hover { border-color: #BBAE8C; color: #5B5142; }
+
+.link-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+
+.link-row { display: flex; gap: 6px; align-items: center; }
+.link-row select {
+  font-family: 'Inter', sans-serif; font-size: 12.5px; padding: 8px 4px; border: 1.5px solid #D8CDB4;
+  border-radius: 4px; background: #fff; color: #26211A; max-width: 100px; flex-shrink: 0;
+}
+.link-row input {
+  flex: 1; min-width: 0; font-family: 'Inter', sans-serif; font-size: 13.5px; padding: 8px 8px;
+  border: 1.5px solid #D8CDB4; border-radius: 4px; background: transparent; outline: none;
+  transition: border-color 0.15s ease;
+}
+.link-row input:focus { border-color: #E2654B; }
+.link-remove-btn { background: none; border: none; color: #9C9382; cursor: pointer; display: flex; padding: 4px; flex-shrink: 0; }
+.link-remove-btn:hover { color: #C2452E; }
+
+.add-link-btn {
+  display: inline-flex; align-items: center; gap: 6px; background: none; border: 1.5px dashed #D8CDB4;
+  border-radius: 6px; padding: 8px 14px; font-size: 12.5px; font-weight: 600; color: #5B5142; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: border-color 0.15s ease;
+}
+.add-link-btn:hover { border-color: #BBAE8C; }
+.add-link-btn:disabled { opacity: 0.4; cursor: default; }
+
+.submit-error, .success-msg { display: none; align-items: center; gap: 6px; font-size: 12.5px; }
+.submit-error.visible, .success-msg.visible { display: flex; }
+.submit-error { color: #C2452E; margin: 0 0 14px; }
+
+.submit-btn {
+  display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+  background: #E2654B; color: #FBF6EC; border: none; border-radius: 6px;
+  padding: 12px 18px; font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+  cursor: pointer; transition: background 0.15s ease, transform 0.1s ease;
+}
+.submit-btn:hover:not(:disabled) { background: #CC543B; }
+.submit-btn:active:not(:disabled) { transform: scale(0.98); }
+.submit-btn:disabled { opacity: 0.65; cursor: default; }
+
+.success-msg { justify-content: center; margin: 14px 0 0; color: #1F6F5C; }
+.success-msg button { background: none; border: none; color: #1F6F5C; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: 13px; padding: 0; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.state-msg { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #DCE7E2; text-align: center; padding: 60px 20px; font-size: 14px; }
+
+.retry-btn { background: #FBF6EC; color: #26211A; border: none; border-radius: 6px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+.search-row {
+  display: flex; align-items: center; gap: 8px; background: rgba(251,246,236,0.95);
+  border-radius: 8px; padding: 10px 14px; margin: 0 auto 26px; color: #5B5142; max-width: 360px;
+}
+.search-row input { flex: 1; border: none; background: none; outline: none; font-size: 13.5px; font-family: 'Inter', sans-serif; color: #26211A; }
+.search-row input::placeholder { color: #A39A86; }
+
+.no-results { text-align: center; color: #C9D6D0; font-size: 13px; }
+
+.category-section { margin-bottom: 34px; }
+
+.category-label {
+  font-family: 'Caveat', cursive; font-weight: 700; font-size: 26px; color: #FBF6EC;
+  margin: 0 0 14px 2px; position: relative; display: inline-block;
+}
+.category-label::after { content: ''; position: absolute; left: 0; bottom: -3px; width: 100%; height: 2px; background: rgba(251,246,236,0.25); transform: skewX(-8deg); }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 28px 20px; }
+
+.listing-card { padding: 20px 16px 16px; transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.listing-card:hover { transform: translateY(-3px) rotate(0deg) !important; box-shadow: 0 16px 30px rgba(0,0,0,0.32); }
+
+.card-hero { width: 100%; height: 110px; object-fit: cover; border-radius: 2px; margin-bottom: 8px; background: #EFE7D4; }
+.card-hero-placeholder { display: flex; align-items: center; justify-content: center; background: #F2ECDD; }
+
+.card-thumb-row { display: flex; gap: 5px; margin-bottom: 10px; }
+.card-thumb-row img { width: 28px; height: 28px; border-radius: 3px; object-fit: cover; border: 1px solid #E4D9C3; }
+
+.listing-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; color: #26211A; }
+
+.tag-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.tag { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border: 1.3px solid; border-radius: 999px; padding: 2px 9px; }
+.pending-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 600; color: #B07A2C; background: #FBF1DE; border-radius: 999px; padding: 2px 8px; }
+
+.listing-desc { font-size: 13px; color: #4A4434; line-height: 1.4; margin: 0 0 12px; }
+
+.listing-meta { display: flex; align-items: center; gap: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6B6354; margin: 0 0 4px; }
+
+.link-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.link-chip {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600;
+  color: #1F6F5C; background: #EAF1EE; border-radius: 999px; padding: 4px 10px; text-decoration: none;
+  transition: background 0.15s ease;
+}
+.link-chip:hover { background: #DCEAE4; }
+
+.visibility-note { display: flex; align-items: center; justify-content: center; gap: 5px; text-align: center; font-size: 11px; color: #8FA59C; margin: 36px 0 0; }
+
+.contact-card { max-width: 420px; margin: 40px auto 0; padding: 18px 20px; display: flex; align-items: center; gap: 14px; transform: rotate(0.5deg); }
+.contact-avatar { width: 60px; height: 94px; border-radius: 10px; object-fit: cover; object-position: top; flex-shrink: 0; border: 2px solid #FBF6EC; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+.contact-info { flex: 1; min-width: 0; }
+.contact-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #9C9382; margin: 0 0 2px; }
+.contact-name { font-size: 15px; font-weight: 700; color: #26211A; margin: 0 0 6px; }
+.contact-links { display: flex; flex-direction: column; gap: 3px; }
+.contact-link { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #1F6F5C; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+.contact-link:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+@media (max-width: 480px) {
+  .board-header h1 { font-size: 36px; }
+  .form-card { padding: 24px 18px 20px; }
+}
+</style>
 </head>
-
 <body>
+<div class="board-root">
+  <div class="board-bg" aria-hidden="true"></div>
 
-<!-- ADMIN BUTTON (hidden from regular visitors) -->
-<button class="admin-btn" onclick="toggleAdminLogin()" style="opacity: 0.3; font-size: 10px;">⚙️</button>
-
-<!-- ADMIN LOGIN -->
-<div class="admin-login" id="adminLogin">
-  <h2>🔐 Admin Login</h2>
-  <div class="error" id="loginError"></div>
-  <input type="password" id="adminPassword" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') verifyPassword()">
-  <button onclick="verifyPassword()">Login</button>
-</div>
-
-<!-- ADMIN PANEL -->
-<div class="admin-panel" id="adminPanel">
-  <h2>📋 Select Spotlight Business</h2>
-  <div class="section">
-    <label>Choose Business:</label>
-    <select id="businessSelect" onchange="updatePreview()">
-      <option value="">Loading businesses...</option>
-    </select>
-    <div class="loading" id="loadingStatus"></div>
-  </div>
-
-  <div class="preview" id="businessPreview"></div>
-
-  <div class="buttons">
-    <button class="btn-save" onclick="saveSpotlight()">💾 Save as Spotlight</button>
-    <button class="btn-logout" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="success" id="successMsg">✅ Spotlight updated!</div>
-</div>
-
-<!-- PAGE HEADER -->
-<div class="container">
-  <div class="page-header">
+  <header class="board-header">
+    <p class="eyebrow">a directory, pinned together</p>
     <h1>Kingdom Business Builders</h1>
-    <p>Pray. Plan. Prosper. | Daily 7 AM Prayer Community</p>
-  </div>
+    <p class="subhead">Pray. Plan. Prosper. | Daily 7 AM Prayer Community</p>
+  </header>
 
-  <!-- SPOTLIGHT CARD (AT TOP FOR PUBLIC) -->
-  <div class="card" id="main-card">
-    <div class="card-top">
-      <!-- LEFT PANEL -->
-      <div class="panel-left">
-        <div class="botw-badge">
-          <div class="badge-crown">👑</div>
-          <div class="badge-biz">BUSINESS</div>
-          <div class="badge-of">OF THE</div>
-          <div class="badge-week">WEEK</div>
-          <div class="badge-stars">★ ★ ★</div>
-        </div>
-      </div>
+  <p id="setup-banner" class="setup-banner hidden"></p>
+  <p id="offline-banner" class="offline-banner hidden"></p>
 
-      <!-- RIGHT PANEL -->
-      <div class="panel-right">
-        <div class="featured-label">⭐ FEATURED THIS WEEK</div>
-        <h2 class="business-name" id="biz-name">Kingdom Lawn Care</h2>
-        <div class="biz-location">📍 <span id="biz-location">Baltimore County</span></div>
-        <div class="category-pill" id="biz-category">Lawn Care & Landscaping</div>
+  <nav class="tabs" role="tablist" aria-label="View">
+    <button id="tab-board" role="tab" class="tab" onclick="switchView('board')">
+      Browse the board<span id="tab-board-count"></span>
+    </button>
+    <button id="tab-form" role="tab" class="tab" onclick="switchView('form')">
+      Pin a business
+    </button>
+  </nav>
 
-        <div class="heart-divider">💛</div>
+  <main id="main-content" class="board-main"></main>
 
-        <div class="action-btns">
-          <button class="btn-act" id="prayed-btn" onclick="handlePrayed()">
-            <span class="b-icon">🙏</span>
-            <span class="b-lbl" id="prayed-lbl">I PRAYED</span>
-          </button>
-          <button class="btn-act" onclick="openShareModal()">
-            <span class="b-icon">📱</span>
-            <span class="b-lbl">SHARE</span>
-          </button>
-        </div>
-
-        <div class="prayer-bar">
-          <span class="pb-icon">❤️</span>
-          <div>
-            <div class="pb-num" id="prayer-count">127</div>
-            <div class="pb-label">PEOPLE PRAYED THIS WEEK</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FOOTER -->
-    <div class="card-footer">
-      <div class="footer-col">
-        <div class="footer-icon">📖</div>
-        <div class="footer-text">
-          <div class="verse-ref" id="verse-ref">PROVERBS 24:3-4</div>
-          <div class="verse-text" id="verse-text">"By wisdom a house is built..."</div>
-        </div>
-      </div>
-
-      <div class="footer-col" style="border-left: 1px solid #e4dfd4; border-right: 1px solid #e4dfd4;">
-        <div style="text-align: center; width: 100%;">
-          <div class="tagline-main">SUPPORT. PRAY. SHARE.</div>
-          <div class="tagline-sub">Build His Kingdom Together.</div>
-        </div>
-      </div>
-
-      <div class="footer-col" style="border-left: none;">
-        <div class="footer-icon">🙏</div>
-        <div class="footer-text">
-          <div class="prayer-text" id="prayer-text">Lord, bless this business...</div>
-        </div>
+  <div class="card contact-card">
+    <div class="thumbtack" style="background: radial-gradient(circle at 35% 30%, #6FA8D8, #3E7CB1);"></div>
+    <img src="data:image/jpeg;base64,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" alt="Ope Fagbemi" class="contact-avatar">
+    <div class="contact-info">
+      <p class="contact-eyebrow">Questions about the board?</p>
+      <p class="contact-name">Ope Fagbemi, Realtor&reg;</p>
+      <div class="contact-links">
+        <a href="tel:2403541364" class="contact-link"></a>
+        <a href="mailto:Opefagbemi@kw.com" class="contact-link"></a>
       </div>
     </div>
   </div>
+
+  <p class="visibility-note"></p>
 </div>
-
-<!-- SHARE MODAL -->
-<div class="shareModal" id="shareModal">
-  <div class="share-content">
-    <div class="share-header">📥 Share this Business</div>
-    <div id="img-preview"></div>
-    <div class="share-buttons">
-      <button class="share-btn" onclick="shareWhatsApp()">
-        <span class="share-btn-icon">💬</span> WhatsApp
-      </button>
-      <button class="share-btn" onclick="shareFacebook()">
-        <span class="share-btn-icon">👍</span> Facebook
-      </button>
-      <button class="share-btn" onclick="shareTwitter()">
-        <span class="share-btn-icon">𝕏</span> Twitter
-      </button>
-      <button class="share-btn" onclick="shareInstagram()">
-        <span class="share-btn-icon">📸</span> Instagram
-      </button>
-      <button class="share-btn" onclick="shareTikTok()">
-        <span class="share-btn-icon">🎵</span> TikTok
-      </button>
-      <button class="share-btn" onclick="shareSMS()">
-        <span class="share-btn-icon">💬</span> iMessage
-      </button>
-      <button class="share-btn" onclick="downloadImage()">
-        <span class="share-btn-icon">⬇️</span> Download
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
 
 <script>
-const ADMIN_PASSWORD = 'admin123';
+/* ============================================================
+   CONFIG — paste your Google Apps Script Web App URL below.
+   See SETUP.md for how to get this. It will end in /exec.
+   ============================================================ */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhcesSQPAkIdZ1YwNBTZFjYyhGMOLZzbleAdxPO9Ilr8z3XZzgUphjWKTmT91wb2_BMg/exec';
-const SUPABASE_URL = 'https://ydwbyeilhdecrgezogqh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2J5ZWlsaGRlY3JnZXpvZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNTg5NjAsImV4cCI6MjA5NzgzNDk2MH0.V3zGn_eiEA8-rC-FhwBrDHFlbAignjg3bWrvPLtxAN0';
-const SITE_URL = window.location.href;
 
-let allBusinesses = [];
-let selectedBusiness = null;
-let shareImageBlob = null;
-let shareImageURL = null;
+/* ============================================================
+   Static data
+   ============================================================ */
+const CATEGORIES = [
+  { id: 'food', label: 'Food', accent: '#E2654B', icon: 'utensils' },
+  { id: 'beauty', label: 'Beauty', accent: '#B8628F', icon: 'sparkles' },
+  { id: 'real-estate', label: 'Real Estate', accent: '#3E7CB1', icon: 'home' },
+  { id: 'retail', label: 'Retail', accent: '#C97F1C', icon: 'shoppingBag' },
+  { id: 'other', label: 'Other', accent: '#6E8079', icon: 'briefcase' },
+];
 
-function getWeekKey() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const startDate = new Date(year, 0, 1);
-  const days = Math.floor((now - startDate) / (24 * 60 * 60 * 1000));
-  const week = Math.ceil((days + startDate.getDay() + 1) / 7);
-  return year + '-W' + String(week).padStart(2, '0');
+const LINK_PLATFORMS = [
+  { id: 'instagram', label: 'Instagram' },
+  { id: 'website', label: 'Website' },
+  { id: 'facebook', label: 'Facebook' },
+  { id: 'tiktok', label: 'TikTok' },
+  { id: 'whatsapp', label: 'WhatsApp' },
+  { id: 'other', label: 'Other' },
+];
+
+const ICONS = {
+  phone: '<path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v3a2 2 0 0 1-2 2C9.5 20 4 14.5 4 7a2 2 0 0 1 1-3z"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  mapPin: '<path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  imagePlus: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 15l-5-5L7 19"/><path d="M16 5h4M18 3v4"/>',
+  x: '<path d="M5 5l14 14M19 5L5 19"/>',
+  link2: '<path d="M9 15l6-6"/><path d="M14 5l1.5-1.5a3.5 3.5 0 1 1 5 5L19 10"/><path d="M10 19l-1.5 1.5a3.5 3.5 0 1 1-5-5L5 14"/>',
+  wifiOff: '<path d="M2 2l20 20"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M5 12.5a10 10 0 0 1 3-2"/><path d="M16 10.5a10 10 0 0 1 3 2"/><path d="M2 8.5a15 15 0 0 1 4.5-3"/><path d="M17.5 5.5A15 15 0 0 1 22 8.5"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/>',
+  refresh: '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  alertCircle: '<circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/>',
+  check: '<path d="M4 12l5 5L20 6"/>',
+  clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/>',
+  loader: '<path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>',
+  pin: '<path d="M12 2a4 4 0 0 0-4 4c0 2 1 3 1 5l-4 2v2h7v6l1 1 1-1v-6h7v-2l-4-2c0-2 1-3 1-5a4 4 0 0 0-4-4z"/>',
+  utensils: '<path d="M7 2v7a2 2 0 1 1-4 0V2M7 9v13M17 2v8a2 2 0 0 0 2 2v10"/>',
+  sparkles: '<path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M19 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+  home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  shoppingBag: '<path d="M6 8h12l-1 13H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
+  briefcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+};
+
+function icon(name, size, cls) {
+  size = size || 16;
+  cls = cls || '';
+  return '<svg class="icon ' + cls + '" width="' + size + '" height="' + size + '" viewBox="0 0 24 24">' + (ICONS[name] || '') + '</svg>';
 }
 
-const WEEK_KEY = getWeekKey();
-
-function showToast(msg, ms = 2800) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('show'), ms);
+function categoryConfig(id) {
+  return CATEGORIES.find(function (c) { return c.id === id; }) || CATEGORIES[CATEGORIES.length - 1];
+}
+function categoryByLabel(label) {
+  return CATEGORIES.find(function (c) { return c.label.toLowerCase() === String(label || '').toLowerCase(); }) || null;
 }
 
-function toggleAdminLogin() {
-  document.getElementById('adminLogin').classList.toggle('show');
-  document.getElementById('adminPanel').classList.remove('show');
-}
-
-function verifyPassword() {
-  const pwd = document.getElementById('adminPassword').value;
-  if (pwd === ADMIN_PASSWORD) {
-    document.getElementById('adminLogin').classList.remove('show');
-    document.getElementById('adminPanel').classList.add('show');
-    document.getElementById('adminPassword').value = '';
-    loadAllBusinesses();
-  } else {
-    const err = document.getElementById('loginError');
-    err.textContent = 'Incorrect password';
-    err.classList.add('show');
-    setTimeout(() => err.classList.remove('show'), 3000);
-  }
-}
-
-function logout() {
-  document.getElementById('adminPanel').classList.remove('show');
-  document.getElementById('adminLogin').classList.add('show');
-}
-
-async function loadAllBusinesses() {
-  try {
-    document.getElementById('loadingStatus').textContent = 'Loading...';
-    const response = await fetch(APPS_SCRIPT_URL);
-    const data = await response.json();
-
-    if (data.success && data.listings) {
-      allBusinesses = data.listings;
-      const select = document.getElementById('businessSelect');
-      select.innerHTML = '<option value="">-- Select a business --</option>';
-
-      allBusinesses.forEach((biz, idx) => {
-        const option = document.createElement('option');
-        option.value = idx;
-        option.textContent = `${biz.name} (${biz.category})`;
-        select.appendChild(option);
-      });
-
-      document.getElementById('loadingStatus').textContent = '✓ Loaded';
-    }
-  } catch(e) {
-    console.error('Load error:', e);
-    document.getElementById('loadingStatus').textContent = '❌ Error loading';
-  }
-}
-
-function updatePreview() {
-  const idx = document.getElementById('businessSelect').value;
-  if (!idx) return;
-
-  selectedBusiness = allBusinesses[idx];
-  const verse = getVerseByCategory(selectedBusiness.category);
-  const prayer = generatePrayer(selectedBusiness);
-
-  const preview = document.getElementById('businessPreview');
-  preview.innerHTML = `
-    <strong>${selectedBusiness.name}</strong><br>
-    📍 ${selectedBusiness.location || 'Location TBD'}<br>
-    📌 ${selectedBusiness.category}<br><br>
-    <strong>Verse:</strong> ${verse.ref}<br>
-    "${verse.text}"<br><br>
-    <strong>Prayer:</strong><br>
-    ${prayer}
-  `;
-}
-
-async function saveSpotlight() {
-  if (!selectedBusiness) {
-    showToast('Please select a business');
-    return;
-  }
-
-  try {
-    const verse = getVerseByCategory(selectedBusiness.category);
-    const prayer = generatePrayer(selectedBusiness);
-
-    await sbFetch('/spotlight_business', {
-      method: 'POST',
-      body: JSON.stringify({
-        week_key: WEEK_KEY,
-        business_name: selectedBusiness.name,
-        business_category: selectedBusiness.category,
-        business_location: selectedBusiness.location,
-        bible_verse: verse.ref,
-        bible_text: verse.text,
-        prayer_text: prayer
-      }),
-      upsert: true
-    });
-
-    document.getElementById('successMsg').classList.add('show');
-    setTimeout(() => {
-      location.reload();
-    }, 1500);
-  } catch(e) {
-    console.error('Save error:', e);
-    showToast('Error saving spotlight');
-  }
-}
-
-function getVerseByCategory(category) {
-  const cat = (category || '').toLowerCase();
-  const verses = {
-    'food': { ref: 'Proverbs 11:25', text: 'The generous will prosper; those who refresh others will themselves be refreshed.' },
-    'lawn': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
-    'landscaping': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
-    'real estate': { ref: 'Proverbs 24:3-4', text: 'By wisdom a house is built, and by understanding it is established.' },
-    'beauty': { ref: 'Psalm 139:14', text: 'I praise you because I am fearfully and wonderfully made.' },
-    'health': { ref: '3 John 1:2', text: 'Dear friend, I pray that you may enjoy good health and that all may go well with you.' },
-    'finance': { ref: 'Proverbs 16:3', text: 'Commit to the Lord whatever you do, and he will establish your plans.' },
-    'business': { ref: 'Proverbs 16:3', text: 'Commit to the Lord whatever you do, and he will establish your plans.' }
-  };
-
-  for (let key in verses) {
-    if (cat.includes(key)) return verses[key];
-  }
-
-  return { ref: 'Colossians 3:23', text: 'Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.' };
-}
-
-function generatePrayer(business) {
-  const prayers = [
-    `Lord, we lift up ${business.name} to You. Bless their work, guide their decisions, and grant them wisdom to serve their community well. May their business bear fruit and glorify Your name.`,
-    `Father, we pray for the team at ${business.name}. Give them strength, integrity, and favor in all they do. Help them impact their community for good.`,
-    `God, we commit ${business.name} into Your hands. Provide for their needs, open doors for growth, and guide them with Your wisdom. Bless their efforts today.`,
-    `Almighty God, watch over ${business.name}. Guide the owners and workers with Your wisdom. May their enterprise succeed and glorify Your name in all they do.`
-  ];
-  return prayers[Math.floor(Math.random() * prayers.length)];
-}
-
-async function sbFetch(path, opts = {}) {
-  const headers = {
-    'apikey': SUPABASE_KEY,
-    'Authorization': `Bearer ${SUPABASE_KEY}`,
-    'Content-Type': 'application/json',
-    ...(opts.prefer ? { 'Prefer': opts.prefer } : {}),
-    ...opts.headers
-  };
-  const res = await fetch(`${SUPABASE_URL}/rest/v1${path}`, {
-    ...opts,
-    headers
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
   });
-  if (!res.ok) throw new Error(await res.text());
-  if (res.status === 204 || res.headers.get('content-length') === '0') return null;
-  const txt = await res.text();
-  return txt ? JSON.parse(txt) : null;
 }
 
-async function loadSpotlight() {
-  try {
-    const wk = encodeURIComponent(WEEK_KEY);
-    const rows = await sbFetch(`/spotlight_business?week_key=eq.${wk}&limit=1`);
-
-    if (rows && rows.length > 0) {
-      const spot = rows[0];
-      document.getElementById('biz-name').textContent = spot.business_name;
-      document.getElementById('biz-location').textContent = spot.business_location;
-      document.getElementById('biz-category').textContent = spot.business_category;
-      document.getElementById('verse-ref').textContent = spot.bible_verse;
-      document.getElementById('verse-text').textContent = `"${spot.bible_text}"`;
-      document.getElementById('prayer-text').textContent = spot.prayer_text;
-
-      await loadPrayerCount(spot.business_name);
-    }
-  } catch(e) {
-    console.error('Load spotlight error:', e);
-  }
+function normalizeUrl(url) {
+  const trimmed = (url || '').trim();
+  if (!trimmed) return '';
+  return /^https?:\/\//i.test(trimmed) ? trimmed : 'https://' + trimmed;
 }
 
-async function loadPrayerCount(businessName) {
-  try {
-    const biz = encodeURIComponent(businessName);
-    const wk = encodeURIComponent(WEEK_KEY);
-    const rows = await sbFetch(
-      `/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}&select=prayer_count`
-    );
-    const total = rows && rows.length > 0 ? rows[0].prayer_count : 0;
-    const display = total > 0 ? total : 127;
-    document.getElementById('prayer-count').textContent = display;
-  } catch(e) {
-    console.error('Prayer count error:', e);
-  }
+function emptyForm() {
+  return { name: '', category: '', categoryOther: '', description: '', contact: '', location: '', images: [], links: [] };
 }
 
-function prayedKey() {
-  return `prayed_${WEEK_KEY}_${document.getElementById('biz-name').textContent}`;
+/* ============================================================
+   State
+   ============================================================ */
+const state = {
+  view: 'board',
+  search: '',
+  listings: [],
+  loadingListings: false,
+  loadError: '',
+  hasLoadedOnce: false,
+  isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+  form: emptyForm(),
+  submitting: false,
+  processingImages: false,
+};
+
+function isConfigured() {
+  return APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === -1;
 }
 
-function alreadyPrayed() {
-  return localStorage.getItem(prayedKey()) === '1';
+/* ============================================================
+   Image resizing — tries progressively smaller/lower quality
+   so the result fits safely inside a Google Sheets cell.
+   ============================================================ */
+function resizeImageSmart(file) {
+  return new Promise(function (resolve, reject) {
+    if (!file.type || file.type.indexOf('image/') !== 0) { reject(new Error('not an image')); return; }
+    const reader = new FileReader();
+    reader.onerror = function () { reject(new Error('read failed')); };
+    reader.onload = function () {
+      const img = new Image();
+      img.onerror = function () { reject(new Error('decode failed')); };
+      img.onload = function () {
+        const attempts = [
+          { dim: 480, q: 0.6 }, { dim: 360, q: 0.5 }, { dim: 260, q: 0.45 }, { dim: 180, q: 0.4 },
+        ];
+        let result = null;
+        for (let i = 0; i < attempts.length; i++) {
+          const a = attempts[i];
+          let w = img.width, h = img.height;
+          if (w > a.dim || h > a.dim) {
+            if (w > h) { h = Math.round(h * (a.dim / w)); w = a.dim; } else { w = Math.round(w * (a.dim / h)); h = a.dim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', a.q);
+          result = dataUrl;
+          if (dataUrl.length < 42000) break;
+        }
+        if (!result || result.length >= 49000) { reject(new Error('too large')); return; }
+        resolve(result);
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-function markPrayed() {
-  localStorage.setItem(prayedKey(), '1');
-}
-
-function setPrayedUI() {
-  const btn = document.getElementById('prayed-btn');
-  btn.classList.add('is-prayed');
-  document.getElementById('prayed-lbl').textContent = 'PRAYED! 🙏';
-  btn.disabled = true;
-}
-
-async function handlePrayed() {
-  if (alreadyPrayed()) {
-    showToast('🙏 You already prayed this week!');
+/* ============================================================
+   Data layer — talks to the Google Apps Script web app
+   ============================================================ */
+async function loadListings() {
+  if (!isConfigured()) {
+    state.loadError = 'Add your Google Apps Script URL at the top of this file to connect the board.';
+    state.hasLoadedOnce = true;
+    renderBoardResults();
     return;
   }
-
-  const btn = document.getElementById('prayed-btn');
-  btn.disabled = true;
-
+  state.loadingListings = true;
+  state.loadError = '';
+  renderBoardResults();
   try {
-    await sbFetch('/spotlight_prayers', {
-      method: 'POST',
-      prefer: 'return=minimal',
-      body: JSON.stringify({
-        business_name: document.getElementById('biz-name').textContent,
-        week_key: WEEK_KEY,
-        prayer_count: 1
-      })
-    });
-
-    markPrayed();
-    setPrayedUI();
-
-    const cur = parseInt(document.getElementById('prayer-count').textContent) || 127;
-    const nxt = cur + 1;
-    document.getElementById('prayer-count').textContent = nxt;
-
-    showToast('🙏 Amen!');
-  } catch(e) {
-    console.error(e);
-    showToast('Error recording prayer');
+    const res = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+    if (!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    const fetched = (data.listings || []).map(function (l) { return Object.assign({}, l, { _synced: true }); });
+    const pendingLocal = state.listings.filter(function (l) { return l._synced === false; });
+    state.listings = pendingLocal.concat(fetched);
+  } catch (err) {
+    state.loadError = (typeof navigator !== 'undefined' && !navigator.onLine)
+      ? "You're offline — connect to load the shared board."
+      : "Couldn't reach the shared board right now.";
   } finally {
-    btn.disabled = false;
+    state.loadingListings = false;
+    state.hasLoadedOnce = true;
+    renderBoardResults();
+    updateTabCount();
   }
 }
 
-async function generateImage() {
-  const card = document.getElementById('main-card');
+async function trySyncEntry(entry) {
+  if (!isConfigured()) return false;
   try {
-    const canvas = await html2canvas(card, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#fdfaf4',
-      logging: false
+    const payload = {
+      name: entry.name, category: entry.category, description: entry.description,
+      contact: entry.contact, location: entry.location, images: entry.images, links: entry.links,
+    };
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
     });
-    return new Promise(resolve => {
-      canvas.toBlob(blob => {
-        resolve({ blob, url: URL.createObjectURL(blob) });
-      }, 'image/jpeg', 0.93);
-    });
-  } catch(e) {
-    console.error('Image error:', e);
-    return null;
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'failed');
+    const idx = state.listings.findIndex(function (l) { return l.id === entry.id; });
+    if (idx !== -1) state.listings[idx] = Object.assign({}, state.listings[idx], { id: data.id, _synced: true });
+    renderBoardResults();
+    updateTabCount();
+    return true;
+  } catch (err) {
+    const idx = state.listings.findIndex(function (l) { return l.id === entry.id; });
+    if (idx !== -1) state.listings[idx] = Object.assign({}, state.listings[idx], { _synced: false });
+    renderBoardResults();
+    return false;
   }
 }
 
-async function openShareModal() {
-  document.getElementById('shareModal').classList.add('open');
-  document.getElementById('img-preview').innerHTML = '<div class="preview-msg">✨ Generating...</div>';
+function retryPending() {
+  state.listings.filter(function (l) { return l._synced === false; }).forEach(function (entry) { trySyncEntry(entry); });
+}
 
-  const result = await generateImage();
-  if (result) {
-    shareImageBlob = result.blob;
-    shareImageURL = result.url;
-    const img = new Image();
-    img.src = shareImageURL;
-    img.style.maxWidth = '100%';
-    document.getElementById('img-preview').innerHTML = '';
-    document.getElementById('img-preview').appendChild(img);
+window.addEventListener('online', function () { state.isOnline = true; updateOfflineBanner(); retryPending(); });
+window.addEventListener('offline', function () { state.isOnline = false; updateOfflineBanner(); });
+
+function updateOfflineBanner() {
+  const el = document.getElementById('offline-banner');
+  if (state.isOnline) { el.classList.add('hidden'); return; }
+  el.innerHTML = icon('wifiOff', 13) + " You're offline — new pins are saved here and will sync once you're reconnected.";
+  el.classList.remove('hidden');
+}
+
+function updateSetupBanner() {
+  const el = document.getElementById('setup-banner');
+  if (isConfigured()) { el.classList.add('hidden'); return; }
+  el.innerHTML = icon('alertCircle', 13) + ' Add your Google Apps Script Web App URL at the top of this file (APPS_SCRIPT_URL) to connect this board to your Google Sheet.';
+  el.classList.remove('hidden');
+}
+
+function updateTabCount() {
+  const el = document.getElementById('tab-board-count');
+  el.textContent = state.listings.length > 0 ? ' (' + state.listings.length + ')' : '';
+}
+
+/* ============================================================
+   Tabs / routing
+   ============================================================ */
+function switchView(view) {
+  state.view = view;
+  document.getElementById('tab-board').classList.toggle('tab-active', view === 'board');
+  document.getElementById('tab-form').classList.toggle('tab-active', view === 'form');
+  document.getElementById('tab-board').setAttribute('aria-selected', view === 'board');
+  document.getElementById('tab-form').setAttribute('aria-selected', view === 'form');
+  const main = document.getElementById('main-content');
+  main.innerHTML = '';
+  if (view === 'board') {
+    buildBoardView(main);
+    if (!state.hasLoadedOnce) loadListings();
   } else {
-    document.getElementById('img-preview').innerHTML = '<div class="preview-msg">⚠️ Error</div>';
+    buildFormView(main);
   }
 }
 
-function shareText() {
-  const n = document.getElementById('prayer-count').textContent;
-  const biz = document.getElementById('biz-name').textContent;
-  return `🙏 ${n} people prayed for ${biz} this week! #KingdomBusinessBuilders`;
+/* ============================================================
+   Board view
+   ============================================================ */
+function buildBoardView(container) {
+  container.innerHTML =
+    '<div class="search-row">' + icon('search', 15) +
+    '<input type="text" id="search-input" placeholder="Search the board…" value="' + escapeHtml(state.search) + '"></div>' +
+    '<div id="board-results"></div>';
+  document.getElementById('search-input').addEventListener('input', function (e) {
+    state.search = e.target.value;
+    renderBoardResults();
+  });
+  renderBoardResults();
 }
 
-function shareWhatsApp() {
-  const txt = encodeURIComponent(`${shareText()}\n\n${SITE_URL}`);
-  window.open(`https://api.whatsapp.com/send?text=${txt}`, '_blank');
-}
+function renderBoardResults() {
+  const container = document.getElementById('board-results');
+  if (!container) return;
 
-function shareFacebook() {
-  const url = encodeURIComponent(SITE_URL);
-  const q = encodeURIComponent(shareText());
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${q}`, '_blank');
-}
-
-function shareTwitter() {
-  const txt = encodeURIComponent(shareText());
-  const url = encodeURIComponent(SITE_URL);
-  window.open(`https://twitter.com/intent/tweet?text=${txt}&url=${url}`, '_blank');
-}
-
-function shareInstagram() {
-  downloadImageDirect();
-  showToast('📸 Image saved!');
-}
-
-function shareTikTok() {
-  downloadImageDirect();
-  showToast('🎵 Image saved!');
-}
-
-function shareSMS() {
-  const txt = encodeURIComponent(`${shareText()}\n\n${SITE_URL}`);
-  window.location.href = `sms:?body=${txt}`;
-}
-
-function downloadImage() {
-  downloadImageDirect();
-}
-
-function downloadImageDirect() {
-  if (!shareImageURL) {
-    showToast('Not ready');
+  if (state.loadingListings) {
+    container.innerHTML = '<div class="state-msg">' + icon('loader', 20, 'spin') + '<p>Fetching the board…</p></div>';
     return;
   }
-  const a = document.createElement('a');
-  a.href = shareImageURL;
-  a.download = `${document.getElementById('biz-name').textContent}-week.jpg`;
-  a.click();
-  showToast('⬇️ Downloaded!');
+  if (state.loadError) {
+    container.innerHTML = '<div class="state-msg">' + icon('alertCircle', 20) + '<p>' + escapeHtml(state.loadError) + '</p>' +
+      '<button class="retry-btn" id="retry-btn">Try again</button></div>';
+    document.getElementById('retry-btn').addEventListener('click', loadListings);
+    return;
+  }
+  if (state.listings.length === 0) {
+    container.innerHTML = '<div class="state-msg">' + icon('clipboard', 22) + '<p>No pins yet — be the first to add a business.</p>' +
+      '<button class="retry-btn" id="add-first-btn">Pin a business</button></div>';
+    document.getElementById('add-first-btn').addEventListener('click', function () { switchView('form'); });
+    return;
+  }
+
+  const q = state.search.trim().toLowerCase();
+  const filtered = q
+    ? state.listings.filter(function (l) {
+        return [l.name, l.category, l.description, l.location].join(' ').toLowerCase().indexOf(q) !== -1;
+      })
+    : state.listings;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="no-results">Nothing matches that search.</p>';
+    return;
+  }
+
+  const groups = {};
+  const order = [];
+  filtered.forEach(function (l) {
+    const key = l.category || 'Other';
+    if (!groups[key]) { groups[key] = []; order.push(key); }
+    groups[key].push(l);
+  });
+
+  let html = '';
+  order.forEach(function (label) {
+    html += '<section class="category-section"><h2 class="category-label">' + escapeHtml(label) + '</h2><div class="card-grid">';
+    groups[label].forEach(function (item) { html += listingCardHtml(item); });
+    html += '</div></section>';
+  });
+  container.innerHTML = html;
 }
 
-async function init() {
-  await loadSpotlight();
-  if (alreadyPrayed()) setPrayedUI();
+function hashRotation(str) {
+  let sum = 0;
+  for (let i = 0; i < String(str).length; i++) sum += String(str).charCodeAt(i);
+  return (sum % 5) - 2;
 }
 
-init();
+function listingCardHtml(item) {
+  const cfg = categoryByLabel(item.category) || categoryConfig('other');
+  const images = item.images || [];
+  const links = item.links || [];
+  const rotation = hashRotation(item.id);
+
+  let heroHtml;
+  if (images[0]) {
+    heroHtml = '<img src="' + images[0] + '" alt="" class="card-hero">';
+  } else {
+    heroHtml = '<div class="card-hero card-hero-placeholder" style="color:' + cfg.accent + ';">' + icon(cfg.icon, 22) + '</div>';
+  }
+
+  let thumbRow = '';
+  if (images.length > 1) {
+    thumbRow = '<div class="card-thumb-row">' + images.slice(1).map(function (src) { return '<img src="' + src + '" alt="">'; }).join('') + '</div>';
+  }
+
+  let pendingBadge = '';
+  if (item._synced === false) {
+    pendingBadge = '<span class="pending-badge">' + icon('refresh', 10) + ' Syncing</span>';
+  }
+
+  let linkChips = '';
+  if (links.length > 0) {
+    linkChips = '<div class="link-chips">' + links.map(function (l) {
+      const p = LINK_PLATFORMS.find(function (pl) { return pl.id === l.platform; });
+      return '<a href="' + escapeHtml(normalizeUrl(l.url)) + '" target="_blank" rel="noopener noreferrer" class="link-chip">' +
+        icon('link2', 11) + ' ' + escapeHtml(p ? p.label : 'Link') + '</a>';
+    }).join('') + '</div>';
+  }
+
+  return '<article class="card listing-card" style="transform: rotate(' + rotation + 'deg);">' +
+    '<div class="thumbtack" style="background: radial-gradient(circle at 35% 30%, ' + cfg.accent + ', ' + cfg.accent + 'cc);"></div>' +
+    heroHtml + thumbRow +
+    '<h3>' + escapeHtml(item.name) + '</h3>' +
+    '<div class="tag-row"><span class="tag" style="border-color:' + cfg.accent + ';color:' + cfg.accent + ';">' + escapeHtml(item.category) + '</span>' + pendingBadge + '</div>' +
+    '<p class="listing-desc">' + escapeHtml(item.description) + '</p>' +
+    '<p class="listing-meta">' + icon('mapPin', 12) + ' ' + escapeHtml(item.location) + '</p>' +
+    '<p class="listing-meta">' + icon('phone', 12) + ' ' + escapeHtml(item.contact) + '</p>' +
+    linkChips +
+    '</article>';
+}
+
+/* ============================================================
+   Form view
+   ============================================================ */
+function buildFormView(container) {
+  let pillsHtml = '';
+  CATEGORIES.forEach(function (c) {
+    pillsHtml += '<button type="button" class="pill" data-cat="' + c.id + '">' + icon(c.icon, 14) + ' ' + escapeHtml(c.label) + '</button>';
+  });
+
+  let platformOptions = LINK_PLATFORMS.map(function (p) { return '<option value="' + p.id + '">' + escapeHtml(p.label) + '</option>'; }).join('');
+
+  container.innerHTML =
+    '<div class="card form-card">' +
+    '<div class="thumbtack" style="background: radial-gradient(circle at 35% 30%, #FF8B72, #C2452E);"></div>' +
+    '<form id="pin-form" novalidate>' +
+
+    '<label class="field"><span class="field-label">Business name</span>' +
+    '<input type="text" id="f-name" maxlength="60" placeholder="e.g. Adaeze\'s Kitchen">' +
+    '<span class="field-error" id="err-name">Add a business name</span></label>' +
+
+    '<div class="field"><span class="field-label">Category</span>' +
+    '<div class="pill-group" id="pill-group">' + pillsHtml + '</div>' +
+    '<input type="text" id="f-category-other" class="other-input hidden" maxlength="30" placeholder="Name this category">' +
+    '<span class="field-error" id="err-category">Pick a category</span></div>' +
+
+    '<label class="field"><span class="field-label">One-line description<span class="field-hint" id="desc-counter">0/90</span></span>' +
+    '<input type="text" id="f-description" maxlength="90" placeholder="What do you offer, in one line">' +
+    '<span class="field-error" id="err-description">Add a one-line description</span></label>' +
+
+    '<label class="field"><span class="field-label">Contact</span>' +
+    '<input type="text" id="f-contact" maxlength="120" placeholder="Phone, email, or WhatsApp">' +
+    '<span class="field-error" id="err-contact">Add a way to reach you</span></label>' +
+
+    '<label class="field"><span class="field-label">Location / area served</span>' +
+    '<input type="text" id="f-location" maxlength="120" placeholder="e.g. Owings Mills, MD">' +
+    '<span class="field-error" id="err-location">Add a location or area</span></label>' +
+
+    '<div class="field"><span class="field-label">Photos<em>optional</em><span class="field-hint" id="photo-count">0/3</span></span>' +
+    '<div class="photo-grid" id="photo-grid"></div>' +
+    '<span class="field-error" id="err-photo">Couldn\'t process one of those images — try a smaller or simpler photo.</span></div>' +
+
+    '<div class="field"><span class="field-label">Links<em>optional</em></span>' +
+    '<div class="link-rows" id="link-rows"></div>' +
+    '<button type="button" class="add-link-btn" id="add-link-btn">' + icon('link2', 13) + ' Add a link</button></div>' +
+
+    '<p class="submit-error" id="submit-error">' + icon('alertCircle', 14) + '<span></span></p>' +
+
+    '<button type="submit" class="submit-btn" id="submit-btn">' + icon('pin', 16) + '<span>Pin to the board</span></button>' +
+
+    '<p class="success-msg" id="success-msg">' + icon('check', 14) + ' Pinned. <button type="button" id="view-board-btn">View the board</button></p>' +
+
+    '</form></div>';
+
+  // Restore current state.form values into the freshly-built DOM
+  document.getElementById('f-name').value = state.form.name;
+  document.getElementById('f-description').value = state.form.description;
+  document.getElementById('f-contact').value = state.form.contact;
+  document.getElementById('f-location').value = state.form.location;
+  document.getElementById('f-category-other').value = state.form.categoryOther;
+  document.getElementById('desc-counter').textContent = state.form.description.length + '/90';
+  if (state.form.category) {
+    const activePill = container.querySelector('.pill[data-cat="' + state.form.category + '"]');
+    if (activePill) setPillActive(activePill);
+    if (state.form.category === 'other') document.getElementById('f-category-other').classList.remove('hidden');
+  }
+
+  // Wire up plain text inputs — update state silently, no re-render (keeps focus/cursor intact)
+  document.getElementById('f-name').addEventListener('input', function (e) {
+    state.form.name = e.target.value; clearFieldError('name');
+  });
+  document.getElementById('f-description').addEventListener('input', function (e) {
+    state.form.description = e.target.value;
+    document.getElementById('desc-counter').textContent = e.target.value.length + '/90';
+    clearFieldError('description');
+  });
+  document.getElementById('f-contact').addEventListener('input', function (e) {
+    state.form.contact = e.target.value; clearFieldError('contact');
+  });
+  document.getElementById('f-location').addEventListener('input', function (e) {
+    state.form.location = e.target.value; clearFieldError('location');
+  });
+  document.getElementById('f-category-other').addEventListener('input', function (e) {
+    state.form.categoryOther = e.target.value; clearFieldError('category');
+  });
+
+  // Category pills
+  container.querySelectorAll('.pill').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setPillActive(btn);
+      state.form.category = btn.dataset.cat;
+      const otherInput = document.getElementById('f-category-other');
+      otherInput.classList.toggle('hidden', btn.dataset.cat !== 'other');
+      clearFieldError('category');
+    });
+  });
+
+  // Photos
+  renderPhotoGrid();
+  document.getElementById('add-link-btn').addEventListener('click', function () {
+    if (state.form.links.length >= 3) return;
+    state.form.links.push({ platform: 'instagram', url: '' });
+    renderLinkRows();
+  });
+  renderLinkRows();
+
+  // Submit
+  document.getElementById('pin-form').addEventListener('submit', handleSubmit);
+  document.getElementById('view-board-btn').addEventListener('click', function () { switchView('board'); });
+}
+
+function setPillActive(activeBtn) {
+  activeBtn.parentElement.querySelectorAll('.pill').forEach(function (btn) {
+    btn.classList.remove('pill-active');
+    btn.style.background = '';
+    btn.style.borderColor = '';
+  });
+  activeBtn.classList.add('pill-active');
+  const cfg = categoryConfig(activeBtn.dataset.cat);
+  activeBtn.style.background = cfg.accent;
+  activeBtn.style.borderColor = cfg.accent;
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photo-grid');
+  if (!grid) return;
+  let html = '';
+  state.form.images.forEach(function (src, i) {
+    html += '<div class="photo-thumb"><img src="' + src + '" alt=""><button type="button" class="photo-thumb-remove" data-i="' + i + '">' + icon('x', 11) + '</button></div>';
+  });
+  if (state.form.images.length < 3) {
+    html += '<label class="add-photo-btn" id="add-photo-label">' + icon('imagePlus', 16) + '<span>Add</span>' +
+      '<input type="file" accept="image/*" multiple hidden id="photo-input"></label>';
+  }
+  grid.innerHTML = html;
+  document.getElementById('photo-count').textContent = state.form.images.length + '/3';
+
+  grid.querySelectorAll('.photo-thumb-remove').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const i = parseInt(btn.dataset.i, 10);
+      state.form.images.splice(i, 1);
+      renderPhotoGrid();
+    });
+  });
+  const fileInput = document.getElementById('photo-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', function (e) {
+      handleImageFiles(e.target.files);
+      e.target.value = '';
+    });
+  }
+}
+
+async function handleImageFiles(fileList) {
+  const remaining = 3 - state.form.images.length;
+  if (remaining <= 0) return;
+  const files = Array.prototype.slice.call(fileList).slice(0, remaining);
+  if (files.length === 0) return;
+  hideFieldError('photo');
+  state.processingImages = true;
+  setAddPhotoBusy(true);
+  try {
+    const results = [];
+    for (let i = 0; i < files.length; i++) results.push(await resizeImageSmart(files[i]));
+    state.form.images = state.form.images.concat(results).slice(0, 3);
+  } catch (err) {
+    showFieldError('photo');
+  } finally {
+    state.processingImages = false;
+    renderPhotoGrid();
+    updateSubmitDisabled();
+  }
+}
+
+function setAddPhotoBusy(busy) {
+  const label = document.getElementById('add-photo-label');
+  if (label) label.innerHTML = busy ? icon('loader', 16, 'spin') + '<span>Adding…</span>' : icon('imagePlus', 16) + '<span>Add</span>';
+  updateSubmitDisabled();
+}
+
+function renderLinkRows() {
+  const wrap = document.getElementById('link-rows');
+  if (!wrap) return;
+  let html = '';
+  state.form.links.forEach(function (link, i) {
+    let options = LINK_PLATFORMS.map(function (p) {
+      return '<option value="' + p.id + '"' + (p.id === link.platform ? ' selected' : '') + '>' + escapeHtml(p.label) + '</option>';
+    }).join('');
+    html += '<div class="link-row" data-i="' + i + '">' +
+      '<select class="link-platform">' + options + '</select>' +
+      '<input type="text" class="link-url" placeholder="Paste a link" value="' + escapeHtml(link.url) + '">' +
+      '<button type="button" class="link-remove-btn" data-i="' + i + '">' + icon('x', 14) + '</button></div>';
+  });
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('.link-row').forEach(function (row) {
+    const i = parseInt(row.dataset.i, 10);
+    row.querySelector('.link-platform').addEventListener('change', function (e) { state.form.links[i].platform = e.target.value; });
+    row.querySelector('.link-url').addEventListener('input', function (e) { state.form.links[i].url = e.target.value; });
+    row.querySelector('.link-remove-btn').addEventListener('click', function () {
+      state.form.links.splice(i, 1);
+      renderLinkRows();
+    });
+  });
+
+  const addBtn = document.getElementById('add-link-btn');
+  if (addBtn) addBtn.disabled = state.form.links.length >= 3;
+}
+
+function showFieldError(key) { const el = document.getElementById('err-' + key); if (el) el.classList.add('visible'); }
+function hideFieldError(key) { const el = document.getElementById('err-' + key); if (el) el.classList.remove('visible'); }
+function clearFieldError(key) { hideFieldError(key); }
+
+function validateForm() {
+  let ok = true;
+  if (!state.form.name.trim()) { showFieldError('name'); ok = false; } else hideFieldError('name');
+  if (!state.form.category) { showFieldError('category'); ok = false; } else if (state.form.category === 'other' && !state.form.categoryOther.trim()) { showFieldError('category'); ok = false; } else hideFieldError('category');
+  if (!state.form.description.trim()) { showFieldError('description'); ok = false; } else hideFieldError('description');
+  if (!state.form.contact.trim()) { showFieldError('contact'); ok = false; } else hideFieldError('contact');
+  if (!state.form.location.trim()) { showFieldError('location'); ok = false; } else hideFieldError('location');
+  return ok;
+}
+
+function updateSubmitDisabled() {
+  const btn = document.getElementById('submit-btn');
+  if (btn) btn.disabled = state.submitting || state.processingImages;
+}
+
+function makeTempId() { return 'temp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  state.submitting = true;
+  updateSubmitDisabled();
+
+  const cleanLinks = state.form.links.map(function (l) { return { platform: l.platform, url: l.url.trim() }; }).filter(function (l) { return l.url; });
+  const categoryLabel = state.form.category === 'other' ? state.form.categoryOther.trim() : categoryConfig(state.form.category).label;
+
+  const entry = {
+    id: makeTempId(),
+    name: state.form.name.trim(),
+    category: categoryLabel,
+    description: state.form.description.trim(),
+    contact: state.form.contact.trim(),
+    location: state.form.location.trim(),
+    images: state.form.images,
+    links: cleanLinks,
+    timestamp: new Date().toISOString(),
+    _synced: false,
+  };
+
+  // Pin it locally right away — works instantly, even before the network call resolves.
+  state.listings = [entry].concat(state.listings);
+  state.hasLoadedOnce = true;
+  updateTabCount();
+
+  // Reset the form UI
+  state.form = emptyForm();
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-description').value = '';
+  document.getElementById('f-contact').value = '';
+  document.getElementById('f-location').value = '';
+  document.getElementById('f-category-other').value = '';
+  document.getElementById('f-category-other').classList.add('hidden');
+  document.getElementById('desc-counter').textContent = '0/90';
+  document.querySelectorAll('.pill').forEach(function (btn) { btn.classList.remove('pill-active'); btn.style.background = ''; btn.style.borderColor = ''; });
+  renderPhotoGrid();
+  renderLinkRows();
+
+  state.submitting = false;
+  updateSubmitDisabled();
+  document.getElementById('success-msg').classList.add('visible');
+  document.getElementById('submit-error').classList.remove('visible');
+  setTimeout(function () {
+    const el = document.getElementById('success-msg');
+    if (el) el.classList.remove('visible');
+  }, 3200);
+
+  const synced = await trySyncEntry(entry);
+  if (!synced) {
+    const msgEl = document.getElementById('submit-error');
+    if (msgEl) {
+      const text = !isConfigured()
+        ? 'Pinned here — connect your Google Sheet URL at the top of this file to make it shared.'
+        : (state.isOnline ? "Pinned here — couldn't reach the shared board, it'll retry automatically." : "Pinned here — you're offline, it'll sync once you're reconnected.");
+      msgEl.querySelector('span').textContent = text;
+      msgEl.classList.add('visible');
+    }
+  }
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+document.querySelector('.contact-link[href^="tel:"]').innerHTML = icon('phone', 12) + ' 240-354-1364';
+document.querySelector('.contact-link[href^="mailto:"]').innerHTML = icon('mail', 12) + ' Opefagbemi@kw.com';
+document.querySelector('.visibility-note').innerHTML = icon('pin', 12) + " Pins are stored in a shared Google Sheet — visible to everyone with this page's link.";
+
+updateSetupBanner();
+updateOfflineBanner();
+switchView('board');
 </script>
-
 </body>
 </html>
