@@ -1356,34 +1356,58 @@ async function downloadFullCard() {
   }
 
   try {
-    // Use html2canvas to capture the card exactly as displayed
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
     script.onload = async () => {
+      // Capture the card with high quality
       const canvas = await html2canvas(card, {
         backgroundColor: '#fdfaf4',
-        scale: 2,
+        scale: 3, // High quality
         useCORS: true,
-        logging: false
+        logging: false,
+        allowTaint: true
       });
 
-      canvas.toBlob((blob) => {
+      // Create landscape format canvas (wider than tall)
+      const landscapeCanvas = document.createElement('canvas');
+      const ratio = canvas.width / canvas.height;
+
+      // If card is already landscape, use as-is; otherwise make landscape
+      if (ratio >= 1) {
+        landscapeCanvas.width = canvas.width;
+        landscapeCanvas.height = canvas.height;
+      } else {
+        // Convert to landscape by using card width as height
+        landscapeCanvas.width = Math.round(canvas.height * 1.5);
+        landscapeCanvas.height = canvas.height;
+      }
+
+      const ctx = landscapeCanvas.getContext('2d');
+      ctx.fillStyle = '#fdfaf4';
+      ctx.fillRect(0, 0, landscapeCanvas.width, landscapeCanvas.height);
+
+      // Center the card
+      const x = (landscapeCanvas.width - canvas.width) / 2;
+      const y = 0;
+      ctx.drawImage(canvas, x, y);
+
+      landscapeCanvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         const bizName = document.getElementById('bizName').textContent;
         link.href = url;
-        link.download = `Kingdom-${bizName.replace(/[^a-z0-9]/gi, '-')}-spotlight.png`;
+        link.download = `${bizName.replace(/[^a-z0-9]/gi, '-')}-Kingdom-Builders.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        showToast('✅ Card downloaded!');
-      });
+        showToast('✅ High-quality landscape image downloaded!');
+      }, 'image/png');
     };
     document.head.appendChild(script);
   } catch (e) {
     console.error('Download error:', e);
-    alert('Error downloading card');
+    showToast('Error downloading card');
   }
 }
 
