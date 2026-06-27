@@ -458,31 +458,19 @@ function resetCrop() {
 }
 
 function useFullImage() {
-  // Convert full image to HIGH QUALITY base64
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  const img = cropState.image;
+  // Store full original image at FULL resolution - NO resizing
+  const file = document.getElementById('businessImage').files[0];
+  if (!file) return;
 
-  // Resize to max 1200px width while preserving aspect ratio and quality
-  const maxWidth = 1200;
-  let w = img.width;
-  let h = img.height;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // Store the original file as-is (full size, full quality)
+    window.selectedImageData = e.target.result;
 
-  if (w > maxWidth) {
-    h = Math.round((h * maxWidth) / w);
-    w = maxWidth;
-  }
-
-  canvas.width = w;
-  canvas.height = h;
-  ctx.drawImage(img, 0, 0, w, h);
-
-  // Use PNG for lossless quality (better than JPEG)
-  const fullImage = canvas.toDataURL('image/png');
-  window.selectedImageData = fullImage;
-
-  document.getElementById('cropContainer').style.display = 'none';
-  document.getElementById('imagePreview').innerHTML = `<img src="${fullImage}" style="width: 100%; height: auto; border-radius: 8px;">`;
+    document.getElementById('cropContainer').style.display = 'none';
+    document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; height: auto; border-radius: 8px;">`;
+  };
+  reader.readAsDataURL(file);
 }
 
 function showCropTool() {
