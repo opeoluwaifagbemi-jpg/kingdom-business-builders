@@ -349,17 +349,39 @@ async function saveSpotlight() {
       image_url: imageUrl
     };
 
-    // Upsert: Insert or update if week_key already exists
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_business`, {
-      method: 'POST',
+    // Check if record exists for this week_key
+    const wk = encodeURIComponent(WEEK_KEY);
+    const existingRows = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_business?week_key=eq.${wk}&limit=1`, {
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates' // Update on conflict
-      },
-      body: JSON.stringify(spotlightData)
-    });
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    }).then(r => r.json());
+
+    let res;
+    if (existingRows && existingRows.length > 0) {
+      // Update existing record
+      res = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_business?week_key=eq.${wk}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(spotlightData)
+      });
+    } else {
+      // Insert new record
+      res = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_business`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(spotlightData)
+      });
+    }
 
     if (!res.ok) {
       const errorText = await res.text();
