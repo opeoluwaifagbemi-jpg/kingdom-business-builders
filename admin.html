@@ -141,6 +141,14 @@
     <div class="preview" id="businessPreview"></div>
 
     <button onclick="saveSpotlight()" style="margin-top: 20px;">💾 Save as Spotlight</button>
+
+    <div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+      <h3 style="margin-top: 0;">Update Prayer Count</h3>
+      <input type="number" id="prayerCountInput" placeholder="Enter prayer count" min="0" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+      <button onclick="updatePrayerCount()" style="width: 100%; padding: 10px; background: #4FA992; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">💓 Update Prayer Count</button>
+      <div class="success" id="prayerCountMsg" style="margin-top: 10px;"></div>
+    </div>
+
     <button class="logout-btn" onclick="logout()">Logout</button>
 
     <div class="success" id="successMsg">✅ Spotlight saved!</div>
@@ -559,6 +567,78 @@ async function uploadImage(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+async function updatePrayerCount() {
+  const prayerCount = document.getElementById('prayerCountInput').value;
+
+  if (!prayerCount || prayerCount < 0) {
+    alert('Please enter a valid prayer count');
+    return;
+  }
+
+  if (!selectedBusiness) {
+    alert('Please select a business first');
+    return;
+  }
+
+  try {
+    const bizName = selectedBusiness.name;
+    const biz = encodeURIComponent(bizName);
+    const wk = encodeURIComponent(WEEK_KEY);
+
+    // Check if prayer record exists
+    const existingRows = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    }).then(r => r.json());
+
+    let res;
+    if (existingRows && existingRows.length > 0) {
+      // Update existing prayer count
+      res = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prayer_count: parseInt(prayerCount) })
+      });
+    } else {
+      // Create new prayer count record
+      res = await fetch(`${SUPABASE_URL}/rest/v1/spotlight_prayers`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          business_name: bizName,
+          week_key: WEEK_KEY,
+          prayer_count: parseInt(prayerCount)
+        })
+      });
+    }
+
+    if (res.ok) {
+      const msg = document.getElementById('prayerCountMsg');
+      msg.textContent = `✅ Prayer count updated to ${prayerCount}!`;
+      msg.classList.add('show');
+      setTimeout(() => {
+        msg.classList.remove('show');
+        document.getElementById('prayerCountInput').value = '';
+      }, 3000);
+    } else {
+      throw new Error(await res.text());
+    }
+  } catch(e) {
+    console.error('Error:', e);
+    alert('❌ Error updating prayer count: ' + e.message);
+  }
 }
 </script>
 
