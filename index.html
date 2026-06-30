@@ -1196,7 +1196,7 @@ async function loadPrayerCount(businessName) {
   try {
     const biz = encodeURIComponent(businessName);
     const wk = encodeURIComponent(WEEK_KEY);
-    const rows = await sbFetch(`/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}&select=prayer_count`);
+    const rows = await sbFetch(`/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}&select=prayer_count&t=${Date.now()}`);
     const total = rows && rows.length > 0 ? rows[0].prayer_count : 0;
     document.getElementById('prayerCount').textContent = total;
   } catch(e) {
