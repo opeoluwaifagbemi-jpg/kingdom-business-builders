@@ -1196,8 +1196,12 @@ async function loadPrayerCount(businessName) {
   try {
     const biz = encodeURIComponent(businessName);
     const wk = encodeURIComponent(WEEK_KEY);
-    const rows = await sbFetch(`/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}&select=prayer_count&t=${Date.now()}`);
+    const url = `/spotlight_prayers?business_name=eq.${biz}&week_key=eq.${wk}&select=prayer_count&t=${Date.now()}`;
+    console.log('Loading prayer count:', { businessName, WEEK_KEY, url });
+    const rows = await sbFetch(url);
+    console.log('Prayer count response:', rows);
     const total = rows && rows.length > 0 ? rows[0].prayer_count : 0;
+    console.log('Setting prayer count to:', total);
     document.getElementById('prayerCount').textContent = total;
   } catch(e) {
     console.error('Prayer count error:', e);
