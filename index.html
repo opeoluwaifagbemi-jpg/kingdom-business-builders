@@ -75,6 +75,7 @@ body { margin: 0; }
 .business-name { font-family: Georgia, serif; font-size: 20px; font-weight: 700; color: #111; line-height: 1.2; margin-bottom: 6px; }
 .biz-location { display: flex; align-items: center; gap: 4px; color: #444; font-size: 11px; margin-bottom: 4px; }
 .category-pill { display: inline-flex; background: #f2efe8; border: 1px solid #dbd5c5; border-radius: 12px; padding: 3px 10px; font-size: 10px; color: #3a3a3a; margin-bottom: 10px; }
+.tag-pill { display: inline-flex; background: #f5f5f5; border: 1.2px solid; border-radius: 12px; padding: 4px 10px; font-size: 10px; font-weight: 600; color: #333; }
 .heart-divider { text-align: center; color: #c4900a; font-size: 14px; margin: 8px 0; }
 .action-btns { display: flex; gap: 10px; margin-bottom: 12px; }
 .btn-act { flex: 1; background: #fff; border: 1.5px solid #e4dfd4; border-radius: 10px; padding: 12px 10px; cursor: pointer; text-align: center; transition: all 0.18s; }
@@ -345,6 +346,7 @@ body { margin: 0; }
           <h2 class="business-name" id="bizName">Select a Business</h2>
           <div class="biz-location">📍 <span id="bizLocation">-</span></div>
           <div class="category-pill" id="bizCategory">-</div>
+          <div class="tags-container" id="bizTags" style="display: none; margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;"></div>
           <div class="action-btns">
             <button class="btn-act" id="prayedBtn" onclick="handlePrayed()">
               <span class="b-icon">🙏</span>
@@ -783,11 +785,20 @@ function listingCardHtml(item) {
     }).join('') + '</div>';
   }
 
+  let tagsHtml = '';
+  if (item.tags && item.tags.length > 0) {
+    const tagsArray = typeof item.tags === 'string' ? item.tags.split(',').map(t => t.trim()) : item.tags;
+    tagsHtml = tagsArray.map(function (tag) {
+      return '<span class="tag-pill" style="border-color: ' + cfg.accent + '; color: ' + cfg.accent + ';">' + escapeHtml(tag) + '</span>';
+    }).join('');
+  }
+
   return '<article class="card listing-card" style="transform: rotate(' + rotation + 'deg);">' +
     '<div class="thumbtack" style="background: radial-gradient(circle at 35% 30%, ' + cfg.accent + ', ' + cfg.accent + 'cc);"></div>' +
     heroHtml + thumbRow +
     '<h3>' + escapeHtml(item.name) + '</h3>' +
     '<div class="tag-row"><span class="tag" style="border-color:' + cfg.accent + ';color:' + cfg.accent + ';">' + escapeHtml(item.category) + '</span>' + pendingBadge + '</div>' +
+    (tagsHtml ? '<div class="tag-row" style="margin-top: 6px;">' + tagsHtml + '</div>' : '') +
     '<p class="listing-desc">' + escapeHtml(item.description) + '</p>' +
     '<p class="listing-meta">' + icon('mapPin', 12) + ' ' + escapeHtml(item.location) + '</p>' +
     '<p class="listing-meta">' + icon('phone', 12) + ' ' + escapeHtml(item.contact) + '</p>' +
@@ -1157,6 +1168,20 @@ async function loadSpotlight() {
       // Display image if available
       if (spot.image_url) {
         document.getElementById('spotlightImageContainer').innerHTML = `<img src="${spot.image_url}" alt="${spot.business_name}">`;
+      }
+
+      // Display tags from hardcoded business list
+      const business = allBusinesses.find(b => b.name === spot.business_name);
+      const tagsContainer = document.getElementById('bizTags');
+      if (business && business.tags && business.tags.length > 0) {
+        tagsContainer.style.display = 'flex';
+        tagsContainer.innerHTML = business.tags.map(tag => {
+          const category = CATEGORIES.find(c => c.label.includes(spot.business_category.split(' ')[0]));
+          const color = category ? category.accent : '#6E8079';
+          return `<span class="tag-pill" style="border-color: ${color}; color: ${color};">${tag}</span>`;
+        }).join('');
+      } else {
+        tagsContainer.style.display = 'none';
       }
 
       // Load prayer count asynchronously (non-blocking)
