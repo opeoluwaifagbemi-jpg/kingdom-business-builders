@@ -1153,10 +1153,13 @@ async function sbFetch(path, opts = {}) {
 async function loadSpotlight() {
   try {
     const wk = encodeURIComponent(WEEK_KEY);
+    console.log('loadSpotlight called with WEEK_KEY:', WEEK_KEY);
     const rows = await sbFetch(`/spotlight_business?week_key=eq.${wk}&limit=1`);
+    console.log('spotlight_business response:', rows);
 
     if (rows && rows.length > 0) {
       const spot = rows[0];
+      console.log('spotlight data loaded:', spot);
       document.getElementById('bizName').textContent = spot.business_name;
       document.getElementById('bizLocation').textContent = spot.business_location;
       document.getElementById('bizCategory').textContent = spot.business_category;
@@ -1184,8 +1187,11 @@ async function loadSpotlight() {
       }
 
       // Load prayer count asynchronously (non-blocking)
+      console.log('About to load prayer count for:', spot.business_name);
       loadPrayerCount(spot.business_name);
       checkAlreadyPrayed();
+    } else {
+      console.error('No spotlight found for week:', WEEK_KEY);
     }
   } catch(e) {
     console.error('Load spotlight error:', e);
