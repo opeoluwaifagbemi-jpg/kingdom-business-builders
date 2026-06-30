@@ -202,20 +202,20 @@ function logout() {
 async function loadAllBusinesses() {
   // Hardcoded business data from your Google Sheet
   const hardcodedListings = [
-    { name: 'Ope Fagbemi, Realtor', category: '🏡 Real Estate', location: 'Maryland', tags: [] },
-    { name: 'Kay Services Inc', category: '🩺 Health & Wellness', location: 'Maryland', tags: ['Autism services'] },
-    { name: 'The Safe Haven Events', category: '🎉 Events & Entertainment', location: 'DMV', tags: ['Events'] },
-    { name: 'Q\'uench drinks', category: '🍽️ Food & Drink', location: 'DMV', tags: [] },
-    { name: 'Shinda Logistics', category: '🚛 Logistics & Transportation', location: 'Baltimore/East Coast', tags: ['Transportation', 'warehouse and logistics'] },
-    { name: 'OAOA LLC', category: '🏡 Real Estate', location: 'Maryland', tags: [] },
-    { name: 'MAOA Propertie', category: '🏡 Real Estate', location: 'Baltimore USA', tags: [] },
-    { name: 'Ambo Pâtisserie', category: '🍽️ Food & Drink', location: 'Maryland', tags: [] },
-    { name: 'BiscorOutlet', category: '🛍️ Retail & Shopping', location: 'Maryland', tags: ['Print on demand', 'Clothing', 'Mugs'] },
-    { name: 'Heritagepro LLC', category: '🏠 Home & Local Services', location: 'Maryland', tags: [] },
-    { name: 'Tots Enterprise LLC', category: '🛍️ Retail & Shopping', location: 'Cockeysville, MT', tags: ['Apparel', 'Promotional products'] },
-    { name: 'Afriverse Foods', category: '🍽️ Food & Drink', location: 'Maryland', tags: [] },
-    { name: 'Glamd By Spark Beauty', category: '💄 Beauty & Personal Care', location: 'DMV', tags: [] },
-    { name: 'Ayaoba\'s Kitchen', category: '🍽️ Food & Drink', location: 'Laurel MD', tags: [] }
+    { name: 'Ope Fagbemi, Realtor', category: 'Real Estate', location: 'Maryland' },
+    { name: 'Kay Services Inc', category: 'Autism services', location: 'Maryland' },
+    { name: 'The Safe Haven Events', category: 'Event Planning', location: 'DMV' },
+    { name: 'Q\'uench drinks', category: 'Food', location: 'DMV' },
+    { name: 'Shinda Logistics', category: 'Transport,logistic', location: 'Baltimore/East Coast' },
+    { name: 'OAOA LLC', category: 'Real Estate', location: 'Maryland' },
+    { name: 'MAOA Propertie', category: 'Real Estate', location: 'Baltimore USA' },
+    { name: 'Ambo Pâtisserie', category: 'Food', location: 'Maryland' },
+    { name: 'BiscorOutlet', category: 'Print on demand', location: 'Maryland' },
+    { name: 'Heritagepro LLC', category: 'Cleaning service', location: 'Maryland' },
+    { name: 'Tots Enterprise 1', category: 'Apparels and pr', location: 'Cockeysville, MT' },
+    { name: 'Afriverse Foods', category: 'Food', location: 'Maryland' },
+    { name: 'Glamd By Spark Beauty', category: 'Makeup Artist', location: 'DMV' },
+    { name: 'Ayaoba\'s Kitchen', category: 'Food', location: 'Laurel MD' }
   ];
 
   allBusinesses = hardcodedListings;
