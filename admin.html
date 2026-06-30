@@ -278,9 +278,11 @@ function getVerseByCategory(category) {
 function generatePrayer(business) {
   const prayers = [
     `Lord, we lift up ${business.name} to You. Bless their work, guide their decisions, and grant them wisdom to serve their community well. May their business bear fruit and glorify Your name.`,
-    `Father, we pray for the team at ${business.name}. Give them strength, integrity, and favor in all they do. Help them impact their community for good.`,
-    `God, we commit ${business.name} into Your hands. Provide for their needs, open doors for growth, and guide them with Your wisdom. Bless their efforts today.`,
-    `Almighty God, watch over ${business.name}. Guide the owners and workers with Your wisdom. May their enterprise succeed and glorify Your name in all they do.`
+    `Lord, we commit ${business.name} into Your care. Provide for their needs, open doors for growth, and guide them with Your grace. Bless all they do today and always.`,
+    `Lord, we pray over ${business.name} and everyone who works there. Grant them wisdom, integrity, and favor. Help them serve with excellence and build something that glorifies Your name.`,
+    `Lord, strengthen the owners and team at ${business.name}. Guide their decisions, protect their business, and help them make a positive impact in their community. Bless them abundantly.`,
+    `Lord, we lift up ${business.name} to You this week. Guide their path, provide for their needs, and grant them favor. May their work be fruitful and glorify Your kingdom.`,
+    `Lord, watch over ${business.name}. Give the owners and workers wisdom, peace, and joy in their work. Help them serve others well and build something meaningful for Your glory.`
   ];
   return prayers[Math.floor(Math.random() * prayers.length)];
 }
